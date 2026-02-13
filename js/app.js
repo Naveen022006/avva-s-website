@@ -16,6 +16,9 @@ window.addEventListener('load', () => {
     }
 });
 
+// ==================== GLOBAL STATE ====================
+const productCache = {};
+
 // ==================== FALLBACK DATA ====================
 // Used when backend is not running
 const FALLBACK_PRODUCTS = [
@@ -132,28 +135,169 @@ function addToCart(product) {
         });
     }
     saveCart(cart);
-    showToast(`${product.name} added to cart!`);
+    updateProductCardUI(product.id);
+    saveCart(cart);
+    updateProductCardUI(product.id);
+    showToast(`${product.name} (${product.weight}) added to cart!`);
 }
 
-function removeFromCart(productId) {
+function addToCartVariant(productId) {
+    const product = productCache[productId];
+    if (!product) return;
+
+    // Get selected weight
+    const select = document.getElementById(`weight-${productId}`);
+    let selectedWeight = product.weight;
+    let selectedPrice = product.price;
+
+    if (select) {
+        selectedWeight = select.value;
+        if (product.weightPrices && product.weightPrices[selectedWeight]) {
+            selectedPrice = product.weightPrices[selectedWeight];
+        } else {
+            // Fallback logic if needed, or keeping base price
+        }
+    }
+
+    const cart = getCart();
+    // Unique ID for variant: productId + weight
+    const variantId = `${productId}-${selectedWeight}`;
+
+    const existing = cart.find(item => item.variantId === variantId);
+
+    if (existing) {
+        existing.quantity += 1;
+    } else {
+        cart.push({
+            variantId: variantId, // New unique key
+            productId: product.id,
+            productName: product.name,
+            price: selectedPrice,
+            weight: selectedWeight,
+            imageUrl: product.imageUrl,
+            quantity: 1
+        });
+    }
+    saveCart(cart);
+    updateProductCardUI(productId);
+    showToast(`${product.name} (${selectedWeight}) added to cart!`);
+}
+
+function removeFromCart(variantId) {
     let cart = getCart();
-    cart = cart.filter(item => item.productId !== productId);
+    cart = cart.filter(item => item.variantId !== variantId);
     saveCart(cart);
     loadCartPage();
+    // We need to find the productId from variantId to update the card UI
+    const productId = variantId.split('-')[0];
+    if (productId) updateProductCardUI(productId);
 }
 
-function updateQuantity(productId, delta) {
-    const cart = getCart();
-    const item = cart.find(item => item.productId === productId);
+function updateQuantity(variantId, delta) {
+    let cart = getCart();
+    const item = cart.find(item => item.variantId === variantId);
     if (item) {
         item.quantity += delta;
         if (item.quantity <= 0) {
-            removeFromCart(productId);
+            removeFromCart(variantId);
             return;
         }
     }
     saveCart(cart);
     loadCartPage();
+    // Update card UI if visible
+    const productId = variantId ? variantId.split('-')[0] : null;
+    if (productId) updateProductCardUI(productId);
+}
+
+// ==================== CARD QUANTITY CONTROLS ====================
+// ==================== CARD QUANTITY CONTROLS ====================
+// This needs to know WHICH variant is selected in the dropdown
+function updateCardQuantity(productId, delta) {
+    const product = productCache[productId];
+    // Get currently selected weight from DOM
+    const select = document.getElementById(`weight-${productId}`);
+    let selectedWeight = product.weight;
+    if (select) selectedWeight = select.value;
+
+    const variantId = `${productId}-${selectedWeight}`;
+    updateQuantity(variantId, delta);
+}
+
+function getCartItemQuantity(productId, weight) {
+    const cart = getCart();
+    // If weight is provided, check for specific variant
+    if (weight) {
+        const variantId = `${productId}-${weight}`;
+        const item = cart.find(i => i.variantId === variantId);
+        return item ? item.quantity : 0;
+    }
+
+    // Fallback or aggregate? For card UI we need specific variant quantity
+    return 0;
+}
+
+function onWeightChange(productId) {
+    const product = productCache[productId];
+    const select = document.getElementById(`weight-${productId}`);
+    const priceEl = document.getElementById(`price-${productId}`);
+
+    if (product && select && priceEl) {
+        const weight = select.value;
+        const newPrice = product.weightPrices[weight];
+        priceEl.textContent = `₹${newPrice}`;
+
+        // Update button state (Add to Cart vs Qty)
+        updateProductCardUI(productId);
+    }
+}
+
+function getCartItemQuantity(productId) {
+    const cart = getCart();
+    const item = cart.find(i => i.productId === productId);
+    return item ? item.quantity : 0;
+}
+
+function renderProductActions(productId) {
+    const product = productCache[productId];
+
+    // Determine selected weight
+    let selectedWeight = product.weight;
+    // Check if DOM element exists to get current selection (during re-render/update)
+    const select = document.getElementById(`weight-${productId}`);
+    if (select) {
+        selectedWeight = select.value;
+    } else if (product.weightPrices) {
+        // Default to first key if available and no DOM yet
+        const keys = Object.keys(product.weightPrices);
+        if (keys.length > 0) selectedWeight = keys[0];
+    }
+
+    const qty = getCartItemQuantity(productId, selectedWeight);
+
+    if (qty > 0) {
+        return `
+            <div class="qty-control">
+                <button class="qty-btn-card" onclick="updateCardQuantity('${productId}', -1)">−</button>
+                <span class="qty-val-card">${qty}</span>
+                <button class="qty-btn-card" onclick="updateCardQuantity('${productId}', 1)">+</button>
+            </div>
+        `;
+    } else {
+        if (!product) return ''; // Should not happen
+        return `
+            <button class="btn btn-primary btn-sm" onclick="addToCartVariant('${productId}')">
+                🛒 Add to Cart
+            </button>
+        `;
+    }
+}
+
+function updateProductCardUI(productId) {
+    const container = document.getElementById(`btn-container-${productId}`);
+    if (container) {
+        container.innerHTML = renderProductActions(productId);
+    }
 }
 
 function updateCartCount() {
@@ -182,6 +326,9 @@ async function fetchProducts() {
 
 // ==================== RENDER PRODUCT CARD ====================
 function renderProductCard(product) {
+    // Cache product for later access
+    productCache[product.id] = product;
+
     const starsHtml = '★'.repeat(Math.floor(product.rating)) + (product.rating % 1 >= 0.5 ? '½' : '');
     return `
         <div class="product-card" data-category="${product.category}">
@@ -199,13 +346,13 @@ function renderProductCard(product) {
                     <span>${product.rating} (${product.reviewCount} reviews)</span>
                 </div>
                 <div class="product-meta">
-                    <span class="product-price">₹${product.price}</span>
-                    <span class="product-weight">${product.weight}</span>
+                    <span class="product-price" id="price-${product.id}">₹${product.price}</span>
+                    ${renderWeightSelector(product)}
                 </div>
                 <div class="product-actions">
-                    <button class="btn btn-primary btn-sm" onclick='addToCart(${JSON.stringify(product).replace(/'/g, "\\'")})'>
-                        🛒 Add to Cart
-                    </button>
+                    <div id="btn-container-${product.id}" style="flex: 1;">
+                        ${renderProductActions(product.id)}
+                    </div>
                     <a href="https://wa.me/919600215761?text=Hi!%20I%20want%20to%20order%20${encodeURIComponent(product.name)}" 
                        target="_blank" class="btn btn-outline btn-sm">
                         💬 WhatsApp
@@ -213,7 +360,29 @@ function renderProductCard(product) {
                 </div>
             </div>
         </div>
+        </div>
     `;
+}
+
+function renderWeightSelector(product) {
+    if (product.weightPrices && Object.keys(product.weightPrices).length > 0) {
+        // Sort keys if possible or just use them
+        // 200g, 250g, 500g, 1kg logic
+        const weights = ["200g", "250g", "500g", "1kg"];
+        // Filter those present in map
+        const available = weights.filter(w => product.weightPrices.hasOwnProperty(w));
+
+        if (available.length === 0) return `<span class="product-weight">${product.weight}</span>`;
+
+        const options = available.map(w => `<option value="${w}">${w}</option>`).join('');
+
+        return `
+            <select id="weight-${product.id}" class="weight-select" onchange="onWeightChange('${product.id}')">
+                ${options}
+            </select>
+        `;
+    }
+    return `<span class="product-weight">${product.weight}</span>`;
 }
 
 // ==================== LOAD FEATURED PRODUCTS (Home page) ====================
@@ -311,11 +480,11 @@ function loadCartPage() {
                     <div class="cart-item-price">₹${item.price} × ${item.quantity} = ₹${item.price * item.quantity}</div>
                 </div>
                 <div class="cart-item-controls">
-                    <button class="qty-btn" onclick="updateQuantity('${item.productId}', -1)">−</button>
+                    <button class="qty-btn" onclick="updateQuantity('${item.variantId || item.productId}', -1)">−</button>
                     <span class="cart-item-qty">${item.quantity}</span>
-                    <button class="qty-btn" onclick="updateQuantity('${item.productId}', 1)">+</button>
+                    <button class="qty-btn" onclick="updateQuantity('${item.variantId || item.productId}', 1)">+</button>
                 </div>
-                <button class="cart-item-remove" onclick="removeFromCart('${item.productId}')" title="Remove">✕</button>
+                <button class="cart-item-remove" onclick="removeFromCart('${item.variantId || item.productId}')" title="Remove">✕</button>
             </div>
         `).join('');
 
@@ -358,7 +527,7 @@ function setupOrderForm() {
             paymentMethod: document.querySelector('input[name="paymentMethod"]:checked').value,
             items: cart.map(item => ({
                 productId: item.productId,
-                productName: item.productName,
+                productName: item.productName + (item.weight ? ` (${item.weight})` : ''),
                 quantity: item.quantity,
                 price: item.price
             })),

@@ -213,13 +213,24 @@
                                 <option value="Special Blends">Special Blends</option>
                             </select>
                         </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label class="form-label">Variant Pricing (Base Price shown on card)</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <input type="number" class="form-input" id="price200g" placeholder="Price for 200g">
+                                <input type="number" class="form-input" id="price250g" placeholder="Price for 250g">
+                                <input type="number" class="form-input" id="price500g" placeholder="Price for 500g">
+                                <input type="number" class="form-input" id="price1kg" placeholder="Price for 1kg">
+                            </div>
+                            <small style="color: var(--text-secondary);">Leave blank if variant not available. Enter
+                                generic price below for card display.</small>
+                        </div>
                         <div class="form-group">
-                            <label class="form-label">Price (₹)</label>
+                            <label class="form-label">Base/Display Price (₹)</label>
                             <input type="number" class="form-input" id="prodPrice" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Weight</label>
-                            <input type="text" class="form-input" id="prodWeight" placeholder="e.g. 100g" required>
+                            <label class="form-label">Base Weight Display</label>
+                            <input type="text" class="form-input" id="prodWeight" placeholder="e.g. 200g" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Description</label>
@@ -380,6 +391,17 @@
                 }
             }
 
+            const weightPrices = {};
+            const p200 = document.getElementById('price200g').value;
+            const p250 = document.getElementById('price250g').value;
+            const p500 = document.getElementById('price500g').value;
+            const p1kg = document.getElementById('price1kg').value;
+
+            if (p200) weightPrices["200g"] = parseFloat(p200);
+            if (p250) weightPrices["250g"] = parseFloat(p250);
+            if (p500) weightPrices["500g"] = parseFloat(p500);
+            if (p1kg) weightPrices["1kg"] = parseFloat(p1kg);
+
             const newProd = {
                 name: document.getElementById('prodName').value,
                 category: document.getElementById('prodCategory').value,
@@ -389,7 +411,8 @@
                 imageUrl: imageUrl,
                 inStock: true,
                 rating: 5.0,
-                reviewCount: 0
+                reviewCount: 0,
+                weightPrices: weightPrices
             };
 
             // In real app add Auth Header
