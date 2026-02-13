@@ -549,11 +549,99 @@ function createParticles() {
     }
 }
 
+// ==================== REVIEWS MANAGEMENT ====================
+async function fetchReviews() {
+    try {
+        const response = await fetch(`${API_BASE}/reviews/top`);
+        if (!response.ok) throw new Error('API error');
+        return await response.json();
+    } catch (error) {
+        console.log('Backend not available for reviews');
+        return [];
+    }
+}
+
+function renderReviewCard(review) {
+    const starsHtml = '★'.repeat(review.rating);
+    // Get first letter of name for avatar
+    const initial = review.customerName ? review.customerName.charAt(0).toUpperCase() : 'A';
+
+    return `
+        <div class="testimonial-card reveal visible">
+            <div class="testimonial-stars">${starsHtml}</div>
+            <p class="testimonial-text">"${review.comment}"</p>
+            <div class="testimonial-author">
+                <div class="author-avatar">${initial}</div>
+                <div>
+                    <strong>${review.customerName}</strong>
+                    <span>Verified Customer</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+async function loadReviews() {
+    const container = document.getElementById('testimonialsGrid');
+    if (!container) return;
+
+    const reviews = await fetchReviews();
+
+    if (reviews.length === 0) {
+        container.innerHTML = '<div class="loading-reviews">No reviews yet. Be the first to share your experience!</div>';
+    } else {
+        container.innerHTML = reviews.map(renderReviewCard).join('');
+    }
+}
+
+function setupReviewForm() {
+    const form = document.getElementById('reviewForm');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+
+        const reviewData = {
+            customerName: document.getElementById('reviewName').value,
+            rating: parseInt(document.querySelector('input[name="rating"]:checked').value),
+            comment: document.getElementById('reviewComment').value
+        };
+
+        try {
+            const response = await fetch(`${API_BASE}/reviews`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(reviewData)
+            });
+
+            if (response.ok) {
+                showToast('Review submitted successfully!');
+                form.reset();
+                loadReviews();
+            } else {
+                throw new Error('Failed to submit');
+            }
+        } catch (error) {
+            showToast('Error submitting review. Please try again.');
+            console.error(error);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    });
+}
+
 // ==================== INITIALIZATION ====================
 document.addEventListener('DOMContentLoaded', () => {
     updateCartCount();
     setupNavbar();
     setupOrderForm();
+    setupReviewForm();
     animateCounters();
     setupScrollReveal();
     createParticles();
@@ -561,5 +649,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load featured products on home page
     if (document.getElementById('featuredProducts')) {
         loadFeaturedProducts();
+    }
+
+    // Load reviews on home page
+    if (document.getElementById('testimonialsGrid')) {
+        loadReviews();
     }
 });

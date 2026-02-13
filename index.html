@@ -248,43 +248,41 @@
                 <span class="section-tag">What Our Customers Say</span>
                 <h2 class="section-title">Trusted by <span class="highlight">Families</span></h2>
             </div>
-            <div class="testimonials-grid">
-                <div class="testimonial-card">
-                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                    <p class="testimonial-text">"The sambar powder is absolutely amazing! Tastes exactly like my
-                        grandmother used to make. Pure and fresh — I can never go back to store-bought."</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">P</div>
-                        <div>
-                            <strong>Priya Ramesh</strong>
-                            <span>Chennai</span>
+            <div class="testimonials-grid" id="testimonialsGrid">
+                <!-- Reviews loaded via JS -->
+                <div class="loading-reviews">Loading reviews...</div>
+            </div>
+
+            <!-- Add Review Form -->
+            <div class="add-review-section">
+                <h3>Share Your Experience</h3>
+                <form id="reviewForm" class="review-form">
+                    <div class="form-group">
+                        <input type="text" id="reviewName" placeholder="Your Name" required class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <div class="rating-input">
+                            <span class="rating-label">Your Rating:</span>
+                            <div class="star-rating">
+                                <input type="radio" id="star5" name="rating" value="5" checked /><label for="star5"
+                                    title="5 stars">★</label>
+                                <input type="radio" id="star4" name="rating" value="4" /><label for="star4"
+                                    title="4 stars">★</label>
+                                <input type="radio" id="star3" name="rating" value="3" /><label for="star3"
+                                    title="3 stars">★</label>
+                                <input type="radio" id="star2" name="rating" value="2" /><label for="star2"
+                                    title="2 stars">★</label>
+                                <input type="radio" id="star1" name="rating" value="1" /><label for="star1"
+                                    title="1 star">★</label>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="testimonial-card">
-                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                    <p class="testimonial-text">"Best biryani masala I've ever used. The aroma is incredible, and you
-                        can tell it's made with quality ingredients. Highly recommended!"</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">A</div>
-                        <div>
-                            <strong>Arun Kumar</strong>
-                            <span>Bangalore</span>
-                        </div>
+                    <div class="form-group">
+                        <textarea id="reviewComment" placeholder="Write your review here..." required class="form-input"
+                            rows="4"></textarea>
                     </div>
-                </div>
-                <div class="testimonial-card">
-                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                    <p class="testimonial-text">"I've been buying from Avva's for 6 months now. The quality is
-                        consistently excellent. The rasam powder is my absolute favorite!"</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">M</div>
-                        <div>
-                            <strong>Meena Sundaram</strong>
-                            <span>Coimbatore</span>
-                        </div>
-                    </div>
-                </div>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </form>
             </div>
         </div>
     </section>
@@ -348,7 +346,7 @@
                     <h4>Contact Us</h4>
                     <p>📞 9600215761</p>
                     <p>📸 @avvashomefoods</p>
-                    <p>📍 Tamil Nadu, India</p>
+                    <p>📍 Puducherry</p>
                 </div>
             </div>
             <div class="footer-bottom">
