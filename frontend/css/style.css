@@ -1796,19 +1796,28 @@ img {
 /* =============================================
    RESPONSIVE
    ============================================= */
+/* =============================================
+   RESPONSIVE
+   ============================================= */
 @media (max-width: 1024px) {
+    .container {
+        padding: 0 24px;
+    }
+
     .hero {
         flex-direction: column;
-        padding: 120px 30px 60px;
+        padding: 120px 24px 60px;
         text-align: center;
+        gap: 40px;
     }
 
     .hero-content {
         max-width: 100%;
+        align-items: center;
     }
 
     .hero-subtitle {
-        margin: 0 auto 36px;
+        margin: 0 auto 24px;
     }
 
     .hero-cta {
@@ -1820,153 +1829,112 @@ img {
     }
 
     .hero-image {
-        width: 340px;
-        height: 340px;
-        margin-top: 40px;
-    }
-
-    .features-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .about-grid {
-        grid-template-columns: 1fr;
-        gap: 40px;
-    }
-
-    .testimonials-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .footer-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .steps-grid {
-        flex-direction: column;
-    }
-
-    .step-connector {
-        width: 2px;
-        height: 40px;
-        flex-direction: column;
-    }
-
-    .connector-line {
-        width: 2px;
-        height: 100%;
-    }
-
-    .connector-dot {
-        right: auto;
-        bottom: -4px;
+        width: 300px;
+        height: 300px;
+        margin-top: 20px;
     }
 }
 
 @media (max-width: 768px) {
+
+    /* Header & Nav */
+    .navbar {
+        padding: 15px 0;
+    }
+
+    .nav-logo-img {
+        height: 35px;
+        /* Smaller logo on mobile */
+    }
+
+    .logo-text {
+        font-size: 1.1rem;
+    }
+
     .nav-links {
         display: none;
         position: absolute;
-        top: 72px;
+        top: 70px;
         left: 0;
         right: 0;
         background: rgba(10, 10, 10, 0.98);
-        backdrop-filter: var(--glass-blur);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         flex-direction: column;
-        padding: 20px;
+        padding: 30px;
         border-bottom: 1px solid var(--border-subtle);
+        gap: 20px;
+        text-align: center;
+        z-index: 1000;
     }
 
     .nav-links.active {
         display: flex;
+        animation: fadeInUp 0.3s ease;
     }
 
     .mobile-menu-btn {
         display: flex;
     }
 
+    /* Adjust Admin Login Button on Mobile */
+    .nav-actions .btn {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+    }
+
+    /* Hero Section */
     .hero-title {
-        font-size: 2.6rem;
+        font-size: 2.2rem;
+        /* Reduce from 3.5rem */
+    }
+
+    .hero-text {
+        font-size: 1rem;
     }
 
     .hero-image {
-        width: 280px;
-        height: 280px;
+        width: 260px;
+        height: 260px;
     }
 
-    .features-grid {
+    /* Grids */
+    .features-grid,
+    .about-grid,
+    .testimonials-grid,
+    .footer-grid {
         grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        /* 2 columns on tablet/large phone */
+        gap: 15px;
     }
 
     .section-title {
         font-size: 2rem;
     }
-
-    .products-grid {
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    }
-
-    .order-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-
-    .filters-bar {
-        flex-direction: column;
-    }
-
-    .search-input {
-        width: 100%;
-    }
-
-    .cta-card {
-        padding: 40px 24px;
-    }
-
-    .cta-title {
-        font-size: 1.8rem;
-    }
-
-    .cta-buttons {
-        flex-direction: column;
-    }
-
-    .footer-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .payment-options {
-        flex-direction: column;
-    }
-
-    .modal-card {
-        padding: 32px 24px;
-    }
-
-    .modal-actions {
-        flex-direction: column;
-    }
-
-    .hero-cta {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .page-title {
-        font-size: 2.2rem;
-    }
 }
 
 @media (max-width: 480px) {
-    .hero-title {
-        font-size: 2rem;
+    .nav-container {
+        gap: 10px;
     }
 
-    .hero-stats {
-        gap: 20px;
+    /* Hide Admin text on very small screens if needed, or scale down */
+    .logo-text {
+        font-size: 1rem;
+    }
+
+    .logo-text span.highlight {
+        display: inline-block;
+        /* Ensure highlight text behaves well */
+    }
+
+    .hero-title {
+        font-size: 1.8rem;
     }
 
     .stat-number {
@@ -1974,8 +1942,52 @@ img {
     }
 
     .hero-image {
-        width: 240px;
-        height: 240px;
+        width: 220px;
+        height: 220px;
+    }
+
+    /* Force 1 column for products on very small screens if content is tight */
+    /* But 2 columns often looks better for e-commerce. Let's stick to 1 if cards are detailed */
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .product-card {
+        max-width: 100%;
+    }
+
+    .cta-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Forms */
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .filters-bar {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .search-input {
+        width: 100%;
+    }
+
+    /* Footer */
+    .footer-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .footer-social {
+        justify-content: center;
     }
 }
 
