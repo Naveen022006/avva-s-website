@@ -17,8 +17,14 @@ public class Product {
     private boolean inStock;
     private double rating;
     private int reviewCount;
+    private java.util.Map<String, Double> weightPrices;
 
-    public Product() {
+    public java.util.Map<String, Double> getWeightPrices() {
+        return weightPrices;
+    }
+
+    public void setWeightPrices(java.util.Map<String, Double> weightPrices) {
+        this.weightPrices = weightPrices;
     }
 
     public Product(String name, String description, double price, String weight,
