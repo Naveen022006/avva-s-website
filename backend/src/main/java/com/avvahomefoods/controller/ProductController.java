@@ -96,6 +96,7 @@ public class ProductController {
             product.setInStock(productDetails.isInStock());
             product.setRating(productDetails.getRating());
             product.setReviewCount(productDetails.getReviewCount());
+            product.setWeightPrices(productDetails.getWeightPrices());
             return ResponseEntity.ok(productRepository.save(product));
         }
         return ResponseEntity.notFound().build();
