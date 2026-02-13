@@ -62,9 +62,22 @@
     --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Typography */
-    --font-display: 'Playfair Display', serif;
-    --font-body: 'Poppins', sans-serif;
-    --font-alt: 'Poppins', sans-serif;
+    --font-display: 'Mogra', system-ui;
+    --font-body: 'Mogra', system-ui;
+    --font-alt: 'Mogra', system-ui;
+}
+
+/* Override for Price - Keep clean */
+.product-price,
+.cart-item-price,
+#subtotal,
+#deliveryCharge,
+#totalAmount,
+.stat-number,
+.weight-select,
+.weight-display {
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 600;
 }
 
 body {
