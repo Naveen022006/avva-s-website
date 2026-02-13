@@ -296,6 +296,11 @@ img {
     justify-content: center;
 }
 
+/* Mobile Only Menu Items */
+.mobile-only {
+    display: none;
+}
+
 /* Mobile Menu */
 .mobile-menu-btn {
     display: none;
@@ -1875,6 +1880,20 @@ img {
 
     .mobile-menu-btn {
         display: flex;
+    }
+
+    /* Mobile Menu Items */
+    .mobile-only {
+        display: block;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        width: 100%;
+    }
+
+    /* Hide Header Button on Mobile */
+    #authActions {
+        display: none;
     }
 
     /* Adjust Admin Login Button on Mobile */
