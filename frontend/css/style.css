@@ -1963,7 +1963,8 @@ img {
     .features-grid,
     .about-grid,
     .testimonials-grid,
-    .footer-grid {
+    .footer-grid,
+    .order-grid {
         grid-template-columns: 1fr;
         gap: 30px;
     }
