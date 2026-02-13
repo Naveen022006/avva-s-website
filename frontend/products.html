@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products | Avva's Home Foods</title>
+    <meta name="description"
+        content="Browse our range of traditional homemade masalas and spice powders. Fresh, Pure, No Preservatives.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- ==================== NAVIGATION ==================== -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="images/logo.png" alt="Avva's Home Foods Logo" class="nav-logo-img">
+                <span class="logo-text">Avva's <span class="highlight">Home Foods</span></span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="products.html" class="active">Products</a></li>
+                <li><a href="order.html">Order</a></li>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">☀️</span>
+                </button>
+                <div id="authActions">
+                    <a href="login.html" class="btn btn-primary btn-sm" id="loginBtn">Admin Login</a>
+                </div>
+                <!-- User Profile Dropdown (Hidden by default) -->
+                <div id="userProfile" style="display: none;">
+                    <span id="userName" style="margin-right: 10px; font-weight: 500;">User</span>
+                    <button id="logoutBtn" class="btn btn-outline btn-sm">Logout</button>
+                </div>
+                <a href="order.html" class="cart-btn" id="cartBtn">
+                    <span class="cart-icon">🛒</span>
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==================== PAGE HEADER ==================== -->
+    <section class="page-header">
+        <div class="container">
+            <span class="section-tag">Shop Fresh Masalas</span>
+            <h1 class="page-title">Our <span class="highlight">Products</span></h1>
+            <p class="page-subtitle">Handcrafted masalas for your kitchen, made with love and tradition</p>
+        </div>
+    </section>
+
+    <!-- ==================== FILTERS ==================== -->
+    <section class="filters-section">
+        <div class="container">
+            <div class="filters-bar">
+                <div class="filter-tabs" id="filterTabs">
+                    <button class="filter-tab active" data-category="all">All Products</button>
+                    <button class="filter-tab" data-category="Masala Powders">Masala Powders</button>
+                    <button class="filter-tab" data-category="Pure Spices">Pure Spices</button>
+                    <button class="filter-tab" data-category="Special Blends">Special Blends</button>
+                </div>
+                <div class="search-box">
+                    <input type="text" placeholder="Search masalas..." id="searchInput" class="search-input">
+                    <span class="search-icon">🔍</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== PRODUCTS GRID ==================== -->
+    <section class="section products-section">
+        <div class="container">
+            <div class="products-grid products-grid-full" id="productsGrid">
+                <!-- Products loaded via JS -->
+            </div>
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-icon">🔍</div>
+                <h3>No products found</h3>
+                <p>Try adjusting your search or filter</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="nav-logo" style="margin-bottom: 16px;">
+                        <img src="images/logo.png" alt="Avva's Home Foods Logo" class="nav-logo-img">
+                        <span class="logo-text">Avva's <span class="highlight">Home Foods</span></span>
+                    </a>
+                    <p>Traditional homemade masalas made with love and tradition. Fresh, pure, and no preservatives.</p>
+                    <div class="footer-social">
+                        <a href="https://www.instagram.com/avvashomefoods" target="_blank" class="social-link">📸
+                            Instagram</a>
+                        <a href="https://wa.me/919600215761" target="_blank" class="social-link">💬 WhatsApp</a>
+                    </div>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Quick Links</h4>
+                    <a href="index.html">Home</a>
+                    <a href="products.html">Products</a>
+                    <a href="order.html">Order</a>
+                    <a href="index.html#about">About Us</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Categories</h4>
+                    <a href="products.html">Masala Powders</a>
+                    <a href="products.html">Pure Spices</a>
+                    <a href="products.html">Special Blends</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Contact Us</h4>
+                    <p>📞 9600215761</p>
+                    <p>📸 @avvashomefoods</p>
+                    <p>📍 Tamil Nadu, India</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Avva's Home Foods. All rights reserved. Made with ❤️</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAllProducts();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avva's Home Foods | Traditional Homemade Masalas</title>
+    <meta name="description"
+        content="Avva's Home Foods - Fresh, Pure, No Preservatives. Traditional homemade masalas and spice powders delivered to your door.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- ==================== NAVIGATION ==================== -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="images/logo.png" alt="Avva's Home Foods Logo" class="nav-logo-img">
+                <span class="logo-text">Avva's <span class="highlight">Home Foods</span></span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="order.html">Order</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle Theme">
+                    <span class="theme-icon">☀️</span>
+                </button>
+                <div id="authActions">
+                    <a href="login.html" class="btn btn-primary btn-sm" id="loginBtn">Admin Login</a>
+                </div>
+                <!-- User Profile Dropdown (Hidden by default) -->
+                <div id="userProfile" style="display: none;">
+                    <span id="userName" style="margin-right: 10px; font-weight: 500;">User</span>
+                    <button id="logoutBtn" class="btn btn-outline btn-sm">Logout</button>
+                    <!-- Admin Dashboard Link (Injected via JS if admin) -->
+                    <a href="admin.html" id="adminLink" class="btn btn-sm btn-primary"
+                        style="display:none; margin-left: 10px;">Dashboard</a>
+                </div>
+
+                <a href="order.html" class="cart-btn" id="cartBtn">
+                    <span class="cart-icon">🛒</span>
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==================== HERO SECTION ==================== -->
+    <section class="hero" id="hero">
+        <div class="hero-bg-overlay"></div>
+        <div class="hero-particles" id="heroParticles"></div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="badge-icon">✨</span>
+                <span>Fresh | Pure | No Preservatives</span>
+            </div>
+            <h1 class="hero-title">
+                Traditional<br>
+                <span class="hero-title-accent">Homemade Masalas</span>
+            </h1>
+            <p class="hero-subtitle">
+                Handcrafted with love by three generations. Experience the authentic taste of
+                India's finest spices, stone-ground and blended the traditional way.
+            </p>
+            <div class="hero-cta">
+                <a href="products.html" class="btn btn-primary btn-lg">
+                    <span>Explore Products</span>
+                    <span class="btn-arrow">→</span>
+                </a>
+                <a href="https://wa.me/919600215761" class="btn btn-outline btn-lg" target="_blank">
+                    <span class="whatsapp-icon">💬</span>
+                    <span>Order on WhatsApp</span>
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number" data-count="500">0</span>+
+                    <span class="stat-label">Happy Customers</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-count="12">0</span>+
+                    <span class="stat-label">Products</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-count="100">0</span>%
+                    <span class="stat-label">Natural</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-image-wrapper">
+            <div class="hero-image-glow"></div>
+            <img src="images/hero.png" alt="Traditional Spices" class="hero-image">
+        </div>
+    </section>
+
+    <!-- ==================== FEATURES STRIP ==================== -->
+    <section class="features-strip">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🌿</div>
+                    <h3>100% Natural</h3>
+                    <p>No artificial colors, flavors, or preservatives</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏠</div>
+                    <h3>Homemade</h3>
+                    <p>Prepared in small batches with traditional recipes</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔥</div>
+                    <h3>Stone Ground</h3>
+                    <p>Hand-roasted and stone-ground for maximum flavor</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📦</div>
+                    <h3>Fresh Delivery</h3>
+                    <p>Made fresh and delivered straight to your doorstep</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FEATURED PRODUCTS ==================== -->
+    <section class="section featured-section" id="featured">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Our Bestsellers</span>
+                <h2 class="section-title">Featured <span class="highlight">Products</span></h2>
+                <p class="section-subtitle">Discover our most loved masalas, trusted by families across India</p>
+            </div>
+            <div class="products-grid" id="featuredProducts">
+                <!-- Products loaded via JS -->
+            </div>
+            <div class="section-cta">
+                <a href="products.html" class="btn btn-primary">
+                    View All Products
+                    <span class="btn-arrow">→</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== ABOUT SECTION ==================== -->
+    <section class="section about-section" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-image-wrapper">
+                    <div class="about-image-frame">
+                        <img src="images/about.jpg" alt="Traditional Spice Preparation" class="about-image">
+                    </div>
+                    <div class="about-experience-badge">
+                        <span class="exp-number">3</span>
+                        <span class="exp-text">Generations of<br>Tradition</span>
+                    </div>
+                </div>
+                <div class="about-content">
+                    <span class="section-tag">Our Story</span>
+                    <h2 class="section-title">Made with <span class="highlight">Love & Tradition</span></h2>
+                    <p class="about-text">
+                        At Avva's Home Foods, we carry forward the legacy of our grandmother's kitchen.
+                        Every masala is a tribute to the traditional recipes passed down through three generations.
+                    </p>
+                    <p class="about-text">
+                        We believe in keeping things simple and pure — just fresh spices, carefully selected,
+                        hand-roasted to perfection, and stone-ground to preserve their natural oils and flavors.
+                        No shortcuts, no preservatives, just honest cooking ingredients.
+                    </p>
+                    <div class="about-highlights">
+                        <div class="about-highlight-item">
+                            <span class="highlight-icon">✅</span>
+                            <span>Sourced from organic farms</span>
+                        </div>
+                        <div class="about-highlight-item">
+                            <span class="highlight-icon">✅</span>
+                            <span>Hand-roasted in small batches</span>
+                        </div>
+                        <div class="about-highlight-item">
+                            <span class="highlight-icon">✅</span>
+                            <span>No chemicals or additives</span>
+                        </div>
+                        <div class="about-highlight-item">
+                            <span class="highlight-icon">✅</span>
+                            <span>FSSAI approved production</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== HOW IT WORKS ==================== -->
+    <section class="section how-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Simple Process</span>
+                <h2 class="section-title">How to <span class="highlight">Order</span></h2>
+                <p class="section-subtitle">Get your favorite masalas in 3 simple steps</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">01</div>
+                    <div class="step-icon">🛒</div>
+                    <h3>Browse & Add to Cart</h3>
+                    <p>Explore our range of handmade masalas and add your favorites to the cart</p>
+                </div>
+                <div class="step-connector">
+                    <span class="connector-line"></span>
+                    <span class="connector-dot"></span>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">02</div>
+                    <div class="step-icon">📝</div>
+                    <h3>Fill Your Details</h3>
+                    <p>Enter your name, address, and phone number for delivery</p>
+                </div>
+                <div class="step-connector">
+                    <span class="connector-line"></span>
+                    <span class="connector-dot"></span>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">03</div>
+                    <div class="step-icon">🚚</div>
+                    <h3>Receive Fresh Masalas</h3>
+                    <p>We prepare and ship your order fresh, delivered right to your doorstep</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== TESTIMONIALS ==================== -->
+    <section class="section testimonials-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">What Our Customers Say</span>
+                <h2 class="section-title">Trusted by <span class="highlight">Families</span></h2>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                    <p class="testimonial-text">"The sambar powder is absolutely amazing! Tastes exactly like my
+                        grandmother used to make. Pure and fresh — I can never go back to store-bought."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">P</div>
+                        <div>
+                            <strong>Priya Ramesh</strong>
+                            <span>Chennai</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                    <p class="testimonial-text">"Best biryani masala I've ever used. The aroma is incredible, and you
+                        can tell it's made with quality ingredients. Highly recommended!"</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">A</div>
+                        <div>
+                            <strong>Arun Kumar</strong>
+                            <span>Bangalore</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                    <p class="testimonial-text">"I've been buying from Avva's for 6 months now. The quality is
+                        consistently excellent. The rasam powder is my absolute favorite!"</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">M</div>
+                        <div>
+                            <strong>Meena Sundaram</strong>
+                            <span>Coimbatore</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CONTACT / CTA SECTION ==================== -->
+    <section class="section cta-section" id="contact">
+        <div class="container">
+            <div class="cta-card">
+                <div class="cta-content">
+                    <h2 class="cta-title">Ready to taste the <span class="highlight">difference?</span></h2>
+                    <p class="cta-text">Order now via WhatsApp or browse our products online. Fresh masalas, delivered
+                        with love.</p>
+                    <div class="cta-buttons">
+                        <a href="https://wa.me/919600215761?text=Hi!%20I%20would%20like%20to%20order%20masalas."
+                            class="btn btn-whatsapp btn-lg" target="_blank">
+                            <span>💬</span> WhatsApp Us — 9600215761
+                        </a>
+                        <a href="products.html" class="btn btn-primary btn-lg">
+                            Shop Online <span class="btn-arrow">→</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="cta-decoration">
+                    <div class="cta-circle"></div>
+                    <div class="cta-circle cta-circle-2"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="nav-logo" style="margin-bottom: 16px;">
+                        <img src="images/logo.png" alt="Avva's Home Foods Logo" class="nav-logo-img">
+                        <span class="logo-text">Avva's <span class="highlight">Home Foods</span></span>
+                    </a>
+                    <p>Traditional homemade masalas made with love and tradition. Fresh, pure, and no preservatives.</p>
+                    <div class="footer-social">
+                        <a href="https://www.instagram.com/avvashomefoods" target="_blank" class="social-link">📸
+                            Instagram</a>
+                        <a href="https://wa.me/919600215761" target="_blank" class="social-link">💬 WhatsApp</a>
+                    </div>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Quick Links</h4>
+                    <a href="index.html">Home</a>
+                    <a href="products.html">Products</a>
+                    <a href="order.html">Order</a>
+                    <a href="#about">About Us</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Categories</h4>
+                    <a href="products.html">Masala Powders</a>
+                    <a href="products.html">Pure Spices</a>
+                    <a href="products.html">Special Blends</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Contact Us</h4>
+                    <p>📞 9600215761</p>
+                    <p>📸 @avvashomefoods</p>
+                    <p>📍 Tamil Nadu, India</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Avva's Home Foods. All rights reserved. Made with ❤️</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+
+</html>

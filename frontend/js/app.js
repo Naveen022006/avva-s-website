@@ -1,0 +1,565 @@
+/* =============================================
+   AVVA'S HOME FOODS — Application JavaScript
+   Cart, Products, Orders, and Interactivity
+   ============================================= */
+
+const API_BASE = 'http://localhost:8080/api';
+
+// Prevent browser from restoring scroll position on refresh
+if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+}
+
+window.addEventListener('load', () => {
+    if (!window.location.hash) {
+        window.scrollTo(0, 0);
+    }
+});
+
+// ==================== FALLBACK DATA ====================
+// Used when backend is not running
+const FALLBACK_PRODUCTS = [
+    {
+        id: "1", name: "Sambar Powder",
+        description: "Traditional homemade sambar powder made with freshly roasted spices. Perfect for authentic South Indian sambar with rich aroma and flavor.",
+        price: 149, weight: "200g", category: "Masala Powders",
+        imageUrl: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400",
+        inStock: true, rating: 4.8, reviewCount: 124
+    },
+    {
+        id: "2", name: "Rasam Powder",
+        description: "Aromatic rasam powder blended with black pepper, cumin, and coriander. Makes the perfect tangy and spicy rasam every time.",
+        price: 129, weight: "200g", category: "Masala Powders",
+        imageUrl: "https://images.unsplash.com/photo-1599909533601-aa4ef8ec3a83?w=400",
+        inStock: true, rating: 4.9, reviewCount: 98
+    },
+    {
+        id: "3", name: "Chicken Masala",
+        description: "Fiery and flavorful chicken masala powder for restaurant-style chicken curry. A perfect blend of over 15 hand-picked spices.",
+        price: 179, weight: "200g", category: "Masala Powders",
+        imageUrl: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=400",
+        inStock: true, rating: 4.7, reviewCount: 156
+    },
+    {
+        id: "4", name: "Garam Masala",
+        description: "Premium garam masala prepared with cinnamon, cardamom, cloves, and star anise. Adds warmth and depth to any dish.",
+        price: 159, weight: "150g", category: "Masala Powders",
+        imageUrl: "https://images.unsplash.com/photo-1532336414038-cf19250c5757?w=400",
+        inStock: true, rating: 4.8, reviewCount: 201
+    },
+    {
+        id: "5", name: "Fish Curry Powder",
+        description: "Special fish curry masala with coastal spice blend. Creates the perfect tangy and spicy fish curry with authentic taste.",
+        price: 169, weight: "200g", category: "Masala Powders",
+        imageUrl: "https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?w=400",
+        inStock: true, rating: 4.6, reviewCount: 87
+    },
+    {
+        id: "6", name: "Turmeric Powder",
+        description: "Pure and organic turmeric powder with high curcumin content. Bright golden color and earthy aroma. No additives or coloring.",
+        price: 99, weight: "250g", category: "Pure Spices",
+        imageUrl: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=400",
+        inStock: true, rating: 4.9, reviewCount: 312
+    },
+    {
+        id: "7", name: "Red Chilli Powder",
+        description: "Medium-hot red chilli powder made from Guntur chillies. Perfect balance of heat and color for everyday cooking.",
+        price: 119, weight: "250g", category: "Pure Spices",
+        imageUrl: "https://images.unsplash.com/photo-1583119022894-919a68a3d0e3?w=400",
+        inStock: true, rating: 4.7, reviewCount: 178
+    },
+    {
+        id: "8", name: "Coriander Powder",
+        description: "Freshly ground coriander powder with a citrusy aroma. Essential for everyday Indian cooking. Stone-ground for best flavor.",
+        price: 89, weight: "250g", category: "Pure Spices",
+        imageUrl: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400",
+        inStock: true, rating: 4.8, reviewCount: 145
+    },
+    {
+        id: "9", name: "Biryani Masala",
+        description: "Aromatic biryani masala with saffron notes. Perfect for Hyderabadi-style dum biryani. Made with 20+ premium whole spices.",
+        price: 199, weight: "150g", category: "Special Blends",
+        imageUrl: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400",
+        inStock: true, rating: 4.9, reviewCount: 267
+    },
+    {
+        id: "10", name: "Pav Bhaji Masala",
+        description: "Mumbai-style pav bhaji masala for street-food flavor at home. Rich blend of spices for the perfect bhaji every time.",
+        price: 139, weight: "200g", category: "Special Blends",
+        imageUrl: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=400",
+        inStock: true, rating: 4.7, reviewCount: 92
+    },
+    {
+        id: "11", name: "Kulambu Chilli Powder",
+        description: "Traditional Tamil Nadu style kulambu chilli powder. Perfect for making aromatic and flavorful kulambu and gravies.",
+        price: 139, weight: "250g", category: "Masala Powders",
+        imageUrl: "https://images.unsplash.com/photo-1599909533601-aa4ef8ec3a83?w=400",
+        inStock: true, rating: 4.8, reviewCount: 176
+    },
+    {
+        id: "12", name: "Pickle Masala",
+        description: "Special masala blend for making traditional Indian pickles. Works great for mango, lemon, and mixed vegetable pickles.",
+        price: 109, weight: "200g", category: "Special Blends",
+        imageUrl: "https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?w=400",
+        inStock: true, rating: 4.6, reviewCount: 64
+    }
+];
+
+// ==================== CART MANAGEMENT ====================
+function getCart() {
+    const cart = localStorage.getItem('avvaCart');
+    return cart ? JSON.parse(cart) : [];
+}
+
+function saveCart(cart) {
+    localStorage.setItem('avvaCart', JSON.stringify(cart));
+    updateCartCount();
+}
+
+function addToCart(product) {
+    const cart = getCart();
+    const existing = cart.find(item => item.productId === product.id);
+    if (existing) {
+        existing.quantity += 1;
+    } else {
+        cart.push({
+            productId: product.id,
+            productName: product.name,
+            price: product.price,
+            weight: product.weight,
+            imageUrl: product.imageUrl,
+            quantity: 1
+        });
+    }
+    saveCart(cart);
+    showToast(`${product.name} added to cart!`);
+}
+
+function removeFromCart(productId) {
+    let cart = getCart();
+    cart = cart.filter(item => item.productId !== productId);
+    saveCart(cart);
+    loadCartPage();
+}
+
+function updateQuantity(productId, delta) {
+    const cart = getCart();
+    const item = cart.find(item => item.productId === productId);
+    if (item) {
+        item.quantity += delta;
+        if (item.quantity <= 0) {
+            removeFromCart(productId);
+            return;
+        }
+    }
+    saveCart(cart);
+    loadCartPage();
+}
+
+function updateCartCount() {
+    const cart = getCart();
+    const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const countElements = document.querySelectorAll('#cartCount');
+    countElements.forEach(el => el.textContent = count);
+}
+
+function getCartSubtotal() {
+    const cart = getCart();
+    return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+}
+
+// ==================== PRODUCT FETCHING ====================
+async function fetchProducts() {
+    try {
+        const response = await fetch(`${API_BASE}/products`);
+        if (!response.ok) throw new Error('API error');
+        return await response.json();
+    } catch (error) {
+        console.log('Backend not available, using fallback data');
+        return FALLBACK_PRODUCTS;
+    }
+}
+
+// ==================== RENDER PRODUCT CARD ====================
+function renderProductCard(product) {
+    const starsHtml = '★'.repeat(Math.floor(product.rating)) + (product.rating % 1 >= 0.5 ? '½' : '');
+    return `
+        <div class="product-card" data-category="${product.category}">
+            <div class="product-image-wrapper">
+                <img src="${product.imageUrl}" alt="${product.name}" class="product-image"
+                     onerror="this.src='https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400'">
+                ${product.inStock ? '<span class="product-badge">In Stock</span>' : ''}
+            </div>
+            <div class="product-info">
+                <div class="product-category">${product.category}</div>
+                <h3 class="product-name">${product.name}</h3>
+                <p class="product-desc">${product.description}</p>
+                <div class="product-rating">
+                    <span class="rating-stars">${starsHtml}</span>
+                    <span>${product.rating} (${product.reviewCount} reviews)</span>
+                </div>
+                <div class="product-meta">
+                    <span class="product-price">₹${product.price}</span>
+                    <span class="product-weight">${product.weight}</span>
+                </div>
+                <div class="product-actions">
+                    <button class="btn btn-primary btn-sm" onclick='addToCart(${JSON.stringify(product).replace(/'/g, "\\'")})'>
+                        🛒 Add to Cart
+                    </button>
+                    <a href="https://wa.me/919600215761?text=Hi!%20I%20want%20to%20order%20${encodeURIComponent(product.name)}" 
+                       target="_blank" class="btn btn-outline btn-sm">
+                        💬 WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// ==================== LOAD FEATURED PRODUCTS (Home page) ====================
+async function loadFeaturedProducts() {
+    const container = document.getElementById('featuredProducts');
+    if (!container) return;
+
+    const products = await fetchProducts();
+    const featured = products.slice(0, 4); // Show first 4 as featured
+    container.innerHTML = featured.map(renderProductCard).join('');
+}
+
+// ==================== LOAD ALL PRODUCTS (Products page) ====================
+let allProducts = [];
+
+async function loadAllProducts() {
+    const container = document.getElementById('productsGrid');
+    const emptyState = document.getElementById('emptyState');
+    if (!container) return;
+
+    allProducts = await fetchProducts();
+    renderFilteredProducts(allProducts);
+
+    // Setup filter tabs
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            filterTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const category = tab.dataset.category;
+            const filtered = category === 'all'
+                ? allProducts
+                : allProducts.filter(p => p.category === category);
+            renderFilteredProducts(filtered);
+        });
+    });
+
+    // Setup search
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = allProducts.filter(p =>
+                p.name.toLowerCase().includes(query) ||
+                p.description.toLowerCase().includes(query) ||
+                p.category.toLowerCase().includes(query)
+            );
+            renderFilteredProducts(filtered);
+        });
+    }
+}
+
+function renderFilteredProducts(products) {
+    const container = document.getElementById('productsGrid');
+    const emptyState = document.getElementById('emptyState');
+    if (!container) return;
+
+    if (products.length === 0) {
+        container.style.display = 'none';
+        if (emptyState) emptyState.style.display = 'block';
+    } else {
+        container.style.display = 'grid';
+        if (emptyState) emptyState.style.display = 'none';
+        container.innerHTML = products.map(renderProductCard).join('');
+    }
+}
+
+// ==================== LOAD CART PAGE ====================
+function loadCartPage() {
+    const cartItemsContainer = document.getElementById('cartItems');
+    const cartEmpty = document.getElementById('cartEmpty');
+    const cartSummary = document.getElementById('cartSummary');
+    const orderFormWrapper = document.getElementById('orderFormWrapper');
+
+    if (!cartItemsContainer) return;
+
+    const cart = getCart();
+
+    if (cart.length === 0) {
+        cartItemsContainer.innerHTML = '';
+        if (cartEmpty) cartEmpty.style.display = 'block';
+        if (cartSummary) cartSummary.style.display = 'none';
+        if (orderFormWrapper) orderFormWrapper.style.display = 'none';
+    } else {
+        if (cartEmpty) cartEmpty.style.display = 'none';
+        if (cartSummary) cartSummary.style.display = 'block';
+        if (orderFormWrapper) orderFormWrapper.style.display = 'block';
+
+        cartItemsContainer.innerHTML = cart.map(item => `
+            <div class="cart-item">
+                <img src="${item.imageUrl}" alt="${item.productName}" class="cart-item-image"
+                     onerror="this.src='https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400'">
+                <div class="cart-item-info">
+                    <div class="cart-item-name">${item.productName}</div>
+                    <div class="cart-item-price">₹${item.price} × ${item.quantity} = ₹${item.price * item.quantity}</div>
+                </div>
+                <div class="cart-item-controls">
+                    <button class="qty-btn" onclick="updateQuantity('${item.productId}', -1)">−</button>
+                    <span class="cart-item-qty">${item.quantity}</span>
+                    <button class="qty-btn" onclick="updateQuantity('${item.productId}', 1)">+</button>
+                </div>
+                <button class="cart-item-remove" onclick="removeFromCart('${item.productId}')" title="Remove">✕</button>
+            </div>
+        `).join('');
+
+        // Update summary
+        const subtotal = getCartSubtotal();
+        const delivery = subtotal >= 500 ? 0 : 50;
+        const total = subtotal + delivery;
+
+        document.getElementById('subtotal').textContent = `₹${subtotal}`;
+        document.getElementById('deliveryCharge').textContent = delivery === 0 ? 'FREE' : `₹${delivery}`;
+        document.getElementById('totalAmount').textContent = `₹${total}`;
+    }
+}
+
+// ==================== ORDER SUBMISSION ====================
+function setupOrderForm() {
+    const form = document.getElementById('orderForm');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const cart = getCart();
+        if (cart.length === 0) {
+            showToast('Your cart is empty!');
+            return;
+        }
+
+        const subtotal = getCartSubtotal();
+        const delivery = subtotal >= 500 ? 0 : 50;
+        const totalAmount = subtotal + delivery;
+
+        const orderData = {
+            customerName: document.getElementById('customerName').value,
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value,
+            address: document.getElementById('address').value,
+            city: document.getElementById('city').value,
+            pincode: document.getElementById('pincode').value,
+            paymentMethod: document.querySelector('input[name="paymentMethod"]:checked').value,
+            items: cart.map(item => ({
+                productId: item.productId,
+                productName: item.productName,
+                quantity: item.quantity,
+                price: item.price
+            })),
+            totalAmount: totalAmount
+        };
+
+        // Try to submit via API
+        try {
+            const response = await fetch(`${API_BASE}/orders`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            });
+
+            if (response.ok) {
+                const order = await response.json();
+                showOrderSuccess(order.id);
+            } else {
+                throw new Error('API error');
+            }
+        } catch (error) {
+            // Fallback: show success with mock order ID
+            const mockId = 'AVH-' + Date.now().toString().slice(-6);
+            showOrderSuccess(mockId);
+        }
+
+        // Clear cart
+        localStorage.removeItem('avvaCart');
+        updateCartCount();
+    });
+}
+
+function showOrderSuccess(orderId) {
+    const modal = document.getElementById('orderSuccessModal');
+    const orderIdEl = document.getElementById('modalOrderId');
+    if (modal) {
+        orderIdEl.textContent = `#${orderId}`;
+        modal.classList.add('active');
+    }
+}
+
+// ==================== TOAST NOTIFICATION ====================
+function showToast(message) {
+    // Remove existing toasts
+    document.querySelectorAll('.toast').forEach(t => t.remove());
+
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `<span class="toast-icon">✅</span> ${message}`;
+    document.body.appendChild(toast);
+
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// ==================== NAVBAR SCROLL EFFECT ====================
+function setupNavbar() {
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+
+    // Theme Handling
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    const icon = themeToggle.querySelector('.theme-icon');
+
+    // Check local storage
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme === 'light') {
+        body.classList.add('light-theme');
+        icon.textContent = '🌙';
+    }
+
+    themeToggle.addEventListener('click', () => {
+        body.classList.toggle('light-theme');
+
+        if (body.classList.contains('light-theme')) {
+            localStorage.setItem('theme', 'light');
+            icon.textContent = '🌙';
+        } else {
+            localStorage.setItem('theme', 'dark');
+            icon.textContent = '☀️';
+        }
+    });
+
+    // Auth State Management
+    const user = JSON.parse(localStorage.getItem('user'));
+    const authActions = document.getElementById('authActions');
+    const userProfile = document.getElementById('userProfile');
+    const userName = document.getElementById('userName');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    if (user && userProfile && authActions) {
+        authActions.style.display = 'none';
+        userProfile.style.display = 'flex';
+        userProfile.style.alignItems = 'center';
+        userName.textContent = user.name || user.username;
+
+        // If Admin, show dashboard link
+        if (user.role === 'ADMIN') {
+            const adminLink = document.getElementById('adminLink');
+            if (adminLink) adminLink.style.display = 'inline-block';
+            userName.textContent += ' (Admin)';
+        }
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('user');
+            window.location.reload();
+        });
+    }
+
+    // Mobile menu toggle
+    const menuBtn = document.getElementById('mobileMenuBtn');
+    const navLinks = document.getElementById('navLinks');
+    if (menuBtn && navLinks) {
+        menuBtn.addEventListener('click', () => {
+            menuBtn.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+    }
+}
+
+// ==================== COUNTER ANIMATION ====================
+function animateCounters() {
+    const counters = document.querySelectorAll('.stat-number[data-count]');
+    counters.forEach(counter => {
+        const target = parseInt(counter.dataset.count);
+        const duration = 2000;
+        const step = target / (duration / 16);
+        let current = 0;
+
+        const timer = setInterval(() => {
+            current += step;
+            if (current >= target) {
+                counter.textContent = target;
+                clearInterval(timer);
+            } else {
+                counter.textContent = Math.floor(current);
+            }
+        }, 16);
+    });
+}
+
+// ==================== SCROLL REVEAL ====================
+function setupScrollReveal() {
+    const revealElements = document.querySelectorAll(
+        '.feature-card, .product-card, .step-card, .testimonial-card, .about-grid'
+    );
+
+    revealElements.forEach(el => el.classList.add('reveal'));
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    revealElements.forEach(el => observer.observe(el));
+}
+
+// ==================== HERO PARTICLES ====================
+function createParticles() {
+    const container = document.getElementById('heroParticles');
+    if (!container) return;
+
+    for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.style.cssText = `
+            position: absolute;
+            width: ${Math.random() * 4 + 2}px;
+            height: ${Math.random() * 4 + 2}px;
+            background: rgba(200, 150, 46, ${Math.random() * 0.3 + 0.1});
+            border-radius: 50%;
+            top: ${Math.random() * 100}%;
+            left: ${Math.random() * 100}%;
+            animation: float ${Math.random() * 4 + 3}s ease-in-out infinite;
+            animation-delay: ${Math.random() * 2}s;
+        `;
+        container.appendChild(particle);
+    }
+}
+
+// ==================== INITIALIZATION ====================
+document.addEventListener('DOMContentLoaded', () => {
+    updateCartCount();
+    setupNavbar();
+    setupOrderForm();
+    animateCounters();
+    setupScrollReveal();
+    createParticles();
+
+    // Load featured products on home page
+    if (document.getElementById('featuredProducts')) {
+        loadFeaturedProducts();
+    }
+});
