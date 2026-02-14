@@ -6,10 +6,12 @@ import java.time.LocalDateTime;
 
 @Document(collection = "reviews")
 public class Review {
+
     @Id
     private String id;
+    private String productId;
     private String customerName;
-    private int rating; // 1-5
+    private int rating; // 1 to 5
     private String comment;
     private LocalDateTime createdAt;
 
@@ -17,7 +19,8 @@ public class Review {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Review(String customerName, int rating, String comment) {
+    public Review(String productId, String customerName, int rating, String comment) {
+        this.productId = productId;
         this.customerName = customerName;
         this.rating = rating;
         this.comment = comment;
@@ -31,6 +34,14 @@ public class Review {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 
     public String getCustomerName() {

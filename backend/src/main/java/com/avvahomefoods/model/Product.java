@@ -27,6 +27,9 @@ public class Product {
         this.weightPrices = weightPrices;
     }
 
+    public Product() {
+    }
+
     public Product(String name, String description, double price, String weight,
             String category, String imageUrl, boolean inStock, double rating, int reviewCount) {
         this.name = name;
