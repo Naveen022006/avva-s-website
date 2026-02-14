@@ -357,10 +357,7 @@ function renderProductCard(product) {
                     <div id="btn-container-${product.id}" style="flex: 1;">
                         ${renderProductActions(product.id)}
                     </div>
-                    <a href="https://wa.me/919600215761?text=Hi!%20I%20want%20to%20order%20${encodeURIComponent(product.name)}" 
-                       target="_blank" class="btn btn-outline btn-sm">
-                        💬 WhatsApp
-                    </a>
+
                 </div>
             </div>
         </div>
@@ -475,7 +472,7 @@ function loadCartPage() {
         if (orderFormWrapper) orderFormWrapper.style.display = 'block';
 
         cartItemsContainer.innerHTML = cart.map(item => `
-        < div class="cart-item" >
+        <div class="cart-item">
             <img src="${item.imageUrl}" alt="${item.productName}" class="cart-item-image"
                 onerror="this.src='https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400'">
                 <div class="cart-item-info">
@@ -823,8 +820,8 @@ document.addEventListener('DOMContentLoaded', () => {
         loadFeaturedProducts();
     }
 
-    // Load reviews on home page
+    // Load reviews on home page - DISABLED per request
     if (document.getElementById('testimonialsGrid')) {
-        loadReviews();
+        // loadReviews(); 
     }
 });
