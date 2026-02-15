@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - Avva's Home Foods</title>
+    <title>Sign Up - Avva's Home Foods</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap"
         rel="stylesheet">
@@ -25,7 +25,7 @@
             border-radius: var(--card-radius);
             padding: 40px;
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
             box-shadow: var(--shadow-lg);
             backdrop-filter: var(--glass-blur);
         }
@@ -100,6 +100,47 @@
             display: none;
             text-align: center;
         }
+
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .separator::before,
+        .separator::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .separator:not(:empty)::before {
+            margin-right: .25em;
+        }
+
+        .separator:not(:empty)::after {
+            margin-left: .25em;
+        }
+
+        .btn-google {
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .btn-google:hover {
+            background: #f8f8f8;
+            border-color: #ccc;
+        }
     </style>
 </head>
 
@@ -114,42 +155,46 @@
                     <span class="logo-text" style="font-size: 1.8rem; white-space: nowrap;">Avva's <span
                             class="highlight">Home Foods</span></span>
                 </div>
-                <h1 class="auth-title">Login</h1>
-                <p class="auth-subtitle">Login to manage products and order history</p>
+                <h1 class="auth-title">Create Account</h1>
+                <p class="auth-subtitle">Join us for authentic homemade flavors</p>
             </div>
 
-            <button type="button" class="btn btn-full btn-lg btn-google" onclick="alert('Google Sign In coming soon!')"
-                style="background: white; color: #333; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 500; margin-bottom: 20px;">
+            <button type="button" class="btn btn-full btn-lg btn-google" onclick="alert('Google Sign Up coming soon!')">
                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google"
                     style="width: 20px; height: 20px;">
-                Sign in with Google
+                Sign up with Google
             </button>
 
-            <div
-                style="display: flex; align-items: center; text-align: center; margin: 20px 0; color: var(--text-secondary); font-size: 0.85rem;">
-                <div style="flex: 1; border-bottom: 1px solid var(--border-light);"></div>
-                <span style="padding: 0 10px;">OR</span>
-                <div style="flex: 1; border-bottom: 1px solid var(--border-light);"></div>
-            </div>
+            <div class="separator">OR</div>
 
-            <form id="loginForm">
-                <div class="error-message" id="loginError">Invalid username or password</div>
+            <form id="signupForm">
+                <div class="error-message" id="signupError">Error registering user</div>
 
                 <div class="form-group">
-                    <label class="form-label">Email / Username</label>
-                    <input type="text" class="form-input" id="username" required>
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" id="fullName" required placeholder="e.g. John Doe">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address (Username)</label>
+                    <input type="email" class="form-input" id="signupEmail" required placeholder="name@example.com">
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Password</label>
-                    <input type="password" class="form-input" id="password" required>
+                    <input type="password" class="form-input" id="signupPassword" required placeholder="••••••••">
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-full btn-lg">Login</button>
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" class="form-input" id="confirmPassword" required placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full btn-lg">Create Account</button>
             </form>
 
             <div class="auth-footer" style="margin-top: 20px;">
-                New to Avva's? <a href="signup.html" class="auth-link">Create an account</a>
+                Already have an account? <a href="login.html" class="auth-link">Login here</a>
             </div>
 
             <div class="auth-footer" style="margin-top: 10px;">
@@ -161,47 +206,47 @@
     <script>
         const API_BASE = 'http://localhost:8080/api/auth';
 
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const errorDiv = document.getElementById('loginError');
+            const name = document.getElementById('fullName').value;
+            const username = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const errorDiv = document.getElementById('signupError');
 
             errorDiv.style.display = 'none';
 
+            if (password !== confirmPassword) {
+                errorDiv.textContent = 'Passwords do not match!';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
             try {
-                const response = await fetch(`${API_BASE}/login`, {
+                const response = await fetch(`${API_BASE}/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        name: name
+                    })
                 });
 
                 if (response.ok) {
-                    const data = await response.json();
-
-                    // Role check removed to allow all users
-                    /*
-                    if (data.role !== 'ADMIN') {
-                        errorDiv.textContent = 'Access Denied: Not an Admin';
-                        errorDiv.style.display = 'block';
-                        return;
-                    } 
-                    */
-
-                    localStorage.setItem('user', JSON.stringify(data));
-                    // alert('Admin Login Successful!');
-                    window.location.href = 'index.html';
+                    // alert('Registration Successful! Please login.');
+                    window.location.href = 'login.html';
                 } else {
-                    errorDiv.textContent = 'Invalid username or password';
+                    const errorText = await response.text();
+                    errorDiv.textContent = errorText || 'Registration failed. Try a different email.';
                     errorDiv.style.display = 'block';
                 }
             } catch (error) {
-                errorDiv.textContent = 'Login failed. Check backend.';
+                console.error(error);
+                errorDiv.textContent = 'Server error. Please try again later.';
                 errorDiv.style.display = 'block';
             }
         });
-
-        // Registration logic removed per user request
     </script>
 </body>
 
