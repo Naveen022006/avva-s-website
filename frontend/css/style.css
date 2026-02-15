@@ -62,9 +62,9 @@
     --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Typography */
-    --font-display: 'Mogra', system-ui;
-    --font-body: 'Mogra', system-ui;
-    --font-alt: 'Mogra', system-ui;
+    --font-display: 'Fraunces', serif;
+    --font-body: 'Manrope', sans-serif;
+    --font-alt: 'Manrope', sans-serif;
 }
 
 /* Override for Price - Keep clean */
@@ -1752,15 +1752,53 @@ img {
 }
 
 /* ScrollReveal classes */
-.reveal {
+/* ScrollReveal classes */
+.reveal,
+.reveal-left,
+.reveal-right {
     opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    transition: opacity 0.8s cubic-bezier(0.5, 0, 0, 1), transform 0.8s cubic-bezier(0.5, 0, 0, 1);
+    will-change: opacity, transform;
 }
 
-.reveal.visible {
+.reveal {
+    transform: translateY(40px);
+}
+
+.reveal-left {
+    transform: translateX(-40px);
+}
+
+.reveal-right {
+    transform: translateX(40px);
+}
+
+.reveal.visible,
+.reveal-left.visible,
+.reveal-right.visible {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate(0);
+}
+
+/* Stagger Delays */
+.delay-100 {
+    transition-delay: 0.1s;
+}
+
+.delay-200 {
+    transition-delay: 0.2s;
+}
+
+.delay-300 {
+    transition-delay: 0.3s;
+}
+
+.delay-400 {
+    transition-delay: 0.4s;
+}
+
+.delay-500 {
+    transition-delay: 0.5s;
 }
 
 /* =============================================

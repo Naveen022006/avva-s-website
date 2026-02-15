@@ -63,19 +63,21 @@ function renderProductDetails(product) {
                 <img src="${product.imageUrl || 'images/placeholder-spice.jpg'}" alt="${product.name}" class="pd-image">
             </div>
             <div class="pd-info">
-                <h1 class="pd-title">${product.name}</h1>
-                <div class="pd-rating" onclick="scrollToReviews()">
+                <h1 class="pd-title reveal">${product.name}</h1>
+                <div class="pd-rating reveal delay-100" onclick="scrollToReviews()">
                     <span class="rating-stars">${getStarRating(product.rating || 0)}</span>
                     <span style="color: var(--text-muted); cursor: pointer; text-decoration: underline;">${product.reviewCount || 0} reviews</span>
                 </div>
                 
-                <div class="pd-price" id="detailPrice">₹${currentPrice}</div>
+                <div class="pd-price reveal delay-200" id="detailPrice">₹${currentPrice}</div>
                 
-                <h4 style="margin-bottom: 10px;">Select Weight</h4>
-                ${weightHtml}
+                <h4 style="margin-bottom: 10px;" class="reveal delay-300">Select Weight</h4>
+                <div class="reveal delay-300">
+                    ${weightHtml}
+                </div>
 
-                <h4 style="margin-bottom: 10px;">Quantity</h4>
-                <div class="product-actions" style="justify-content: flex-start; margin-bottom: 30px;">
+                <h4 style="margin-bottom: 10px;" class="reveal delay-400">Quantity</h4>
+                <div class="product-actions reveal delay-400" style="justify-content: flex-start; margin-bottom: 30px;">
                     <div class="qty-control" style="width: 120px;">
                         <button class="qty-btn-card" onclick="adjustDetailQty(-1)">-</button>
                         <span class="qty-val-card" id="detailQty">1</span>
@@ -149,6 +151,11 @@ function renderProductDetails(product) {
     // init sticky bar
     updateStickyBar(currentPrice, currentWeight);
     document.getElementById('stickyCartBar').style.display = 'flex';
+
+    // Re-run scroll reveal to animate new elements
+    if (typeof setupScrollReveal === 'function') {
+        setTimeout(setupScrollReveal, 100);
+    }
 }
 
 // Global state for current selection
@@ -210,7 +217,7 @@ function addToCartCurrent() {
     // app.js addToCart takes (id, name, price, weight, image) and adds 1.
     // We should loop or modify. For safety, let's just add once for now properly.
 
-    addToCart(id, name, selectedPrice, selectedWeightText, img);
+    addToCart(id, name, selectedPrice, selectedWeightText, img, qty);
     // If we want to support quantity > 1, we need to update app.js addToCart to accept quantity.
 }
 
