@@ -110,8 +110,22 @@ const FALLBACK_PRODUCTS = [
 
 // ==================== CART MANAGEMENT ====================
 function getCart() {
-    const cart = localStorage.getItem('avvaCart');
-    return cart ? JSON.parse(cart) : [];
+    const cartJson = localStorage.getItem('avvaCart');
+    if (!cartJson) return [];
+    try {
+        let cart = JSON.parse(cartJson);
+        // Filter out invalid items (fixes undefined/NaN issues)
+        const validCart = cart.filter(item => item.productId && item.productName && item.productName !== 'undefined' && !isNaN(item.price));
+        if (validCart.length !== cart.length) {
+            console.log('Cleaned up invalid cart items');
+            saveCart(validCart);
+            return validCart;
+        }
+        return cart;
+    } catch (e) {
+        console.error('Error parsing cart:', e);
+        return [];
+    }
 }
 
 function saveCart(cart) {
@@ -119,26 +133,43 @@ function saveCart(cart) {
     updateCartCount();
 }
 
-function addToCart(product) {
+function addToCart(id, name, price, weight, imageUrl, quantity = 1) {
+    // Handle object passed (legacy support)
+    if (typeof id === 'object') {
+        const product = id;
+        id = product.id;
+        name = product.name;
+        price = product.price;
+        weight = product.weight;
+        imageUrl = product.imageUrl;
+        quantity = product.quantity || 1;
+    }
+
     const cart = getCart();
-    const existing = cart.find(item => item.productId === product.id);
+    // Unique ID for variant: productId + weight
+    // If weight is missing/null, use productId as variantId (or default weight)
+    const variantId = weight ? `${id}-${weight}` : id;
+
+    const existing = cart.find(item => item.variantId === variantId || (item.productId === id && item.weight === weight));
+
     if (existing) {
-        existing.quantity += 1;
+        existing.quantity += quantity;
+        showToast(`Quantity updated in cart!`);
     } else {
         cart.push({
-            productId: product.id,
-            productName: product.name,
-            price: product.price,
-            weight: product.weight,
-            imageUrl: product.imageUrl,
-            quantity: 1
+            variantId: variantId,
+            productId: id,
+            productName: name,
+            price: price,
+            weight: weight,
+            imageUrl: imageUrl,
+            quantity: quantity
         });
+        showToast(`${name} ${weight ? '(' + weight + ')' : ''} added to cart!`);
     }
+
     saveCart(cart);
-    updateProductCardUI(product.id);
-    saveCart(cart);
-    updateProductCardUI(product.id);
-    showToast(`${product.name} (${product.weight}) added to cart!`);
+    updateProductCardUI(id);
 }
 
 function addToCartVariant(productId) {
@@ -680,18 +711,28 @@ function animateCounters() {
 // ==================== SCROLL REVEAL ====================
 function setupScrollReveal() {
     const revealElements = document.querySelectorAll(
-        '.feature-card, .product-card, .step-card, .testimonial-card, .about-grid'
+        '.feature-card, .product-card, .step-card, .testimonial-card, .about-grid, .reveal, .reveal-left, .reveal-right, .section-title, .section-subtitle, .product-desc, .hero-title, .hero-subtitle'
     );
 
-    revealElements.forEach(el => el.classList.add('reveal'));
+    revealElements.forEach(el => {
+        // Default to reveal-up if no specific class
+        if (!el.classList.contains('reveal-left') && !el.classList.contains('reveal-right')) {
+            el.classList.add('reveal');
+        }
+    });
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
+                // Optional: Stop observing once revealed
+                observer.unobserve(entry.target);
             }
         });
-    }, { threshold: 0.1 });
+    }, {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px" // Trigger slightly before element is fully in view
+    });
 
     revealElements.forEach(el => observer.observe(el));
 }
