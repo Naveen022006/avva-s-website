@@ -17,6 +17,7 @@ public class Product {
     private boolean inStock;
     private double rating;
     private int reviewCount;
+    private String ingredients;
     private java.util.Map<String, Double> weightPrices;
 
     public java.util.Map<String, Double> getWeightPrices() {
@@ -31,7 +32,7 @@ public class Product {
     }
 
     public Product(String name, String description, double price, String weight,
-            String category, String imageUrl, boolean inStock, double rating, int reviewCount) {
+            String category, String imageUrl, boolean inStock, double rating, int reviewCount, String ingredients) {
         this.name = name;
         this.description = description;
         this.price = price;
@@ -41,6 +42,7 @@ public class Product {
         this.inStock = inStock;
         this.rating = rating;
         this.reviewCount = reviewCount;
+        this.ingredients = ingredients;
     }
 
     // Getters and Setters
@@ -122,5 +124,13 @@ public class Product {
 
     public void setReviewCount(int reviewCount) {
         this.reviewCount = reviewCount;
+    }
+
+    public String getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(String ingredients) {
+        this.ingredients = ingredients;
     }
 }

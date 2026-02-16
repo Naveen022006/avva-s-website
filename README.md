@@ -88,3 +88,6 @@ If you prefer using the terminal to open the website:
 *   **MongoDB Connection Error**: Ensure your local MongoDB service is running.
 *   **Port 8080 in use**: If the backend fails to start, check if another application is using port 8080. You can change the port in `application.properties` (e.g., `server.port=8081`).
 *   **CORS Issues**: If the frontend cannot communicate with the backend, ensure `@CrossOrigin` is enabled on your backend controllers.
+
+
+http://localhost:8000/signup.html

@@ -27,84 +27,95 @@ const FALLBACK_PRODUCTS = [
         description: "Traditional homemade sambar powder made with freshly roasted spices. Perfect for authentic South Indian sambar with rich aroma and flavor.",
         price: 149, weight: "200g", category: "Masala Powders",
         imageUrl: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600",
-        inStock: true, rating: 4.8, reviewCount: 124
+        inStock: true, rating: 0, reviewCount: 0,
+        ingredients: "Traditional spices, No preservatives, Home made"
     },
     {
         id: "2", name: "Rasam Powder",
         description: "Aromatic rasam powder blended with black pepper, cumin, and coriander. Makes the perfect tangy and spicy rasam every time.",
         price: 129, weight: "200g", category: "Masala Powders",
         imageUrl: "https://images.unsplash.com/photo-1604543956799-d41ae5bd5cf5?w=600",
-        inStock: true, rating: 4.9, reviewCount: 98
+        inStock: true, rating: 0, reviewCount: 0,
+        ingredients: "Traditional spices, No preservatives, Home made"
     },
     {
         id: "3", name: "Chicken Masala",
         description: "Fiery and flavorful chicken masala powder for restaurant-style chicken curry. A perfect blend of over 15 hand-picked spices.",
         price: 179, weight: "200g", category: "Masala Powders",
         imageUrl: "https://images.unsplash.com/photo-1626338782987-9b2c3227493a?w=600",
-        inStock: true, rating: 4.7, reviewCount: 156
+        inStock: true, rating: 0, reviewCount: 0,
+        ingredients: "Traditional spices, No preservatives, Home made"
     },
     {
         id: "4", name: "Garam Masala",
         description: "Premium garam masala prepared with cinnamon, cardamom, cloves, and star anise. Adds warmth and depth to any dish.",
         price: 159, weight: "150g", category: "Masala Powders",
         imageUrl: "https://images.unsplash.com/photo-1557007558-8ee57754f923?w=600",
-        inStock: true, rating: 4.8, reviewCount: 201
+        inStock: true, rating: 0, reviewCount: 0,
+        ingredients: "Traditional spices, No preservatives, Home made"
     },
     {
         id: "5", name: "Fish Curry Powder",
         description: "Special fish curry masala with coastal spice blend. Creates the perfect tangy and spicy fish curry with authentic taste.",
         price: 169, weight: "200g", category: "Masala Powders",
         imageUrl: "https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?w=600",
-        inStock: true, rating: 4.6, reviewCount: 87
+        inStock: true, rating: 0, reviewCount: 0,
+        ingredients: "Traditional spices, No preservatives, Home made"
     },
     {
         id: "6", name: "Turmeric Powder",
         description: "Pure and organic turmeric powder with high curcumin content. Bright golden color and earthy aroma. No additives or coloring.",
         price: 99, weight: "250g", category: "Pure Spices",
         imageUrl: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=600",
-        inStock: true, rating: 4.9, reviewCount: 312
+        inStock: true, rating: 0, reviewCount: 0,
+        ingredients: "Traditional spices, No preservatives, Home made"
     },
     {
         id: "7", name: "Red Chilli Powder",
         description: "Medium-hot red chilli powder made from Guntur chillies. Perfect balance of heat and color for everyday cooking.",
         price: 119, weight: "250g", category: "Pure Spices",
         imageUrl: "https://images.unsplash.com/photo-1583119022894-919a68a3d0e3?w=600",
-        inStock: true, rating: 4.7, reviewCount: 178
+        inStock: true, rating: 0, reviewCount: 0,
+        ingredients: "Traditional spices, No preservatives, Home made"
     },
     {
         id: "8", name: "Coriander Powder",
         description: "Freshly ground coriander powder with a citrusy aroma. Essential for everyday Indian cooking. Stone-ground for best flavor.",
         price: 89, weight: "250g", category: "Pure Spices",
         imageUrl: "https://images.unsplash.com/photo-1599909533601-aa4ef8ec3a83?w=600",
-        inStock: true, rating: 4.8, reviewCount: 145
+        inStock: true, rating: 0, reviewCount: 0,
+        ingredients: "Traditional spices, No preservatives, Home made"
     },
     {
         id: "9", name: "Biryani Masala",
         description: "Aromatic biryani masala with saffron notes. Perfect for Hyderabadi-style dum biryani. Made with 20+ premium whole spices.",
         price: 199, weight: "150g", category: "Special Blends",
         imageUrl: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=600",
-        inStock: true, rating: 4.9, reviewCount: 267
+        inStock: true, rating: 0, reviewCount: 0,
+        ingredients: "Traditional spices, No preservatives, Home made"
     },
     {
         id: "10", name: "Pav Bhaji Masala",
         description: "Mumbai-style pav bhaji masala for street-food flavor at home. Rich blend of spices for the perfect bhaji every time.",
         price: 139, weight: "200g", category: "Special Blends",
         imageUrl: "https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?w=600",
-        inStock: true, rating: 4.7, reviewCount: 92
+        inStock: true, rating: 0, reviewCount: 0,
+        ingredients: "Traditional spices, No preservatives, Home made"
     },
     {
         id: "11", name: "Kulambu Chilli Powder",
         description: "Traditional Tamil Nadu style kulambu chilli powder. Perfect for making aromatic and flavorful kulambu and gravies.",
         price: 139, weight: "250g", category: "Masala Powders",
         imageUrl: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600",
-        inStock: true, rating: 4.8, reviewCount: 176
+        inStock: true, rating: 0, reviewCount: 0,
+        ingredients: "Traditional spices, No preservatives, Home made"
     },
     {
         id: "12", name: "Pickle Masala",
         description: "Special masala blend for making traditional Indian pickles. Works great for mango, lemon, and mixed vegetable pickles.",
         price: 109, weight: "200g", category: "Special Blends",
         imageUrl: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=600",
-        inStock: true, rating: 4.6, reviewCount: 64
+        inStock: true, rating: 0, reviewCount: 0
     }
 ];
 
@@ -397,13 +408,7 @@ function renderProductCard(product) {
 
 function renderWeightSelector(product) {
     if (product.weightPrices && Object.keys(product.weightPrices).length > 0) {
-        // Sort keys if possible or just use them
-        // 200g, 250g, 500g, 1kg logic
-        const weights = ["200g", "250g", "500g", "1kg"];
-        // Filter those present in map
-        const available = weights.filter(w => product.weightPrices.hasOwnProperty(w));
-
-        if (available.length === 0) return `<span class="product-weight">${product.weight}</span>`;
+        const available = Object.keys(product.weightPrices);
 
         const options = available.map(w => `<option value="${w}">${w}</option>`).join('');
 

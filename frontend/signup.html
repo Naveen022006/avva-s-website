@@ -29,6 +29,17 @@
             max-width: 450px;
             box-shadow: var(--shadow-lg);
             backdrop-filter: var(--glass-blur);
+            transition: var(--transition-normal);
+        }
+
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 30px 20px;
+            }
+
+            .auth-title {
+                font-size: 1.75rem;
+            }
         }
 
         .auth-header {
@@ -157,10 +168,10 @@
         <div class="auth-card">
             <div class="auth-header">
                 <div
-                    style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 20px; flex-wrap: nowrap;">
-                    <img src="images/logo.png" alt="Logo" class="auth-logo" style="margin-bottom: 0; height: 50px;">
-                    <span class="logo-text" style="font-size: 1.8rem; white-space: nowrap;">Avva's <span
-                            class="highlight">Home Foods</span></span>
+                    style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <img src="images/logo.png" alt="Logo" class="auth-logo" style="margin-bottom: 0; height: 45px;">
+                    <span class="logo-text" style="font-size: 1.5rem;">Avva's <span class="highlight">Home
+                            Foods</span></span>
                 </div>
                 <h1 class="auth-title">Create Account</h1>
                 <p class="auth-subtitle">Join us for authentic homemade flavors</p>
@@ -206,22 +217,30 @@
         </div>
     </div>
 
+    <script src="js/config.js"></script>
     <script>
         const API_BASE = 'http://localhost:8080/api/auth';
 
         // Initialize Google Sign-In
         window.onload = function () {
+            if (typeof CONFIG === 'undefined' || !CONFIG.GOOGLE_CLIENT_ID) {
+                console.error('Configuration missing! check js/config.js');
+                return;
+            }
+
             google.accounts.id.initialize({
-                ***REMOVED***,
+                client_id: CONFIG.GOOGLE_CLIENT_ID,
                 callback: handleGoogleSignUp
             });
+
+            const buttonWidth = window.innerWidth < 400 ? window.innerWidth - 80 : 350;
 
             google.accounts.id.renderButton(
                 document.getElementById('google-signup-button'),
                 {
                     theme: 'outline',
                     size: 'large',
-                    width: 350,
+                    width: buttonWidth,
                     text: 'signup_with'
                 }
             );

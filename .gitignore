@@ -3,3 +3,6 @@
 **/.vscode/
 **/.idea/
 **/.env
+
+# Frontend Config
+frontend/js/config.js
