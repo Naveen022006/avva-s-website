@@ -87,7 +87,6 @@ function renderProductDetails(product) {
 
                 <div class="hide-mobile">
                      <button class="btn btn-primary btn-lg" style="width: 100%; margin-bottom: 15px;" onclick="addToCartCurrent()">Add to Cart</button>
-                     <button class="btn btn-outline btn-lg" style="width: 100%;" onclick="buyNow()">Buy It Now</button>
                 </div>
 
                 <!-- Accordion Sections -->

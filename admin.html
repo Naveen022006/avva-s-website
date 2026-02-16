@@ -361,6 +361,62 @@
                 </div>
             </div>
         </div>
+        <!-- View Order Modal -->
+        <div id="viewOrderModal" class="modal"
+            style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+            <div class="modal-content"
+                style="background-color: var(--bg-card); margin: 5% auto; padding: 30px; border: 1px solid var(--border-subtle); width: 95%; max-width: 700px; border-radius: var(--card-radius);">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-light); padding-bottom: 15px;">
+                    <h3 style="margin: 0; color: var(--primary);">Order Details</h3>
+                    <span class="close" onclick="closeViewModal()"
+                        style="color: var(--text-secondary); font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+                </div>
+
+                <div id="viewOrderContent" style="color: var(--text-primary);">
+                    <!-- Loaded dynamically -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                        <div>
+                            <h4 style="color: var(--text-secondary); margin-bottom: 10px;">Customer Info</h4>
+                            <p><strong>Name:</strong> <span id="viewCustName"></span></p>
+                            <p><strong>Phone:</strong> <span id="viewCustPhone"></span></p>
+                            <p><strong>Email:</strong> <span id="viewCustEmail"></span></p>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--text-secondary); margin-bottom: 10px;">Order Info</h4>
+                            <p><strong>Order ID:</strong> <span id="viewOrderId"></span></p>
+                            <p><strong>Date:</strong> <span id="viewOrderDate"></span></p>
+                            <p><strong>Status:</strong> <span id="viewOrderStatus"></span></p>
+                        </div>
+                    </div>
+
+                    <h4 style="color: var(--text-secondary); margin-bottom: 10px;">Shipping Address</h4>
+                    <div
+                        style="background: var(--bg-elevated); padding: 15px; border-radius: 8px; margin-bottom: 30px;">
+                        <p id="viewOrderAddress" style="margin: 0; line-height: 1.6;"></p>
+                    </div>
+
+                    <h4 style="color: var(--text-secondary); margin-bottom: 10px;">Order Items</h4>
+                    <table class="data-table" style="margin-bottom: 20px;">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="viewOrderItems"></tbody>
+                    </table>
+
+                    <div
+                        style="text-align: right; font-size: 1.2rem; font-weight: 700; color: var(--primary); border-top: 1px solid var(--border-light); padding-top: 15px;">
+                        Total Amount: <span id="viewOrderTotal"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     </div>
 
     <script src="js/app.js"></script>
@@ -434,20 +490,6 @@
                 console.error("Err loading products", e);
             }
         }
-
-        document.getElementById('addProductForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            // ... (keep existing add logic mostly same, but ensure weightPrices is handled correctly if changed) ...
-            // Simplified for brevity, assuming common logic
-            await handleProductSubmit(e, 'ADD');
-        });
-
-        // Reusing logic for Add/Edit might be complex due to file upload in Add
-        // Let's keep Add as is for now in previous code block if not fully replaced
-        // BUT wait, I replaced the whole block. I need to restore Add logic or include it.
-        // The instruction said "Replace loadAdminProducts and update logic". 
-        // It seems I need to include the Add logic again or separate it.
-        // To be safe, I will include the Add logic again.
 
         document.getElementById('addProductForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -582,9 +624,13 @@
 
         // Close modal if clicked outside
         window.onclick = function (event) {
-            const modal = document.getElementById('editProductModal');
-            if (event.target == modal) {
-                modal.style.display = 'none';
+            const editModal = document.getElementById('editProductModal');
+            const viewModal = document.getElementById('viewOrderModal');
+            if (event.target == editModal) {
+                editModal.style.display = 'none';
+            }
+            if (event.target == viewModal) {
+                viewModal.style.display = 'none';
             }
         }
 
@@ -597,32 +643,43 @@
         // --- ORDERS LOGIC ---
         const API_ORDERS = 'http://localhost:8080/api/orders';
 
+        // Make orders accessible globally for the view function without re-fetching
+        let allOrders = [];
+
         async function loadAdminOrders() {
             try {
-                // Determine user Auth Header if using JWT
-                const res = await fetch(API_ORDERS); // Need backend to allow this or send token
-                const orders = await res.json();
+                const res = await fetch(API_ORDERS);
+                allOrders = await res.json();
                 const tbody = document.getElementById('ordersTableBody');
                 tbody.innerHTML = '';
 
-                if (Array.isArray(orders)) {
-                    orders.forEach(o => {
+                if (Array.isArray(allOrders)) {
+                    allOrders.forEach(o => {
                         const items = o.items.map(i => `${i.productName} (x${i.quantity})`).join(', ');
                         const date = new Date(o.createdAt).toLocaleDateString();
-                        const statusClass = o.status === 'DELIVERED' ? 'status-delivered' : 'status-pending';
 
                         const tr = document.createElement('tr');
+
+                        // Status options
+                        const statuses = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
+                        let statusOptions = statuses.map(s =>
+                            `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`
+                        ).join('');
+
                         tr.innerHTML = `
                             <td>#${o.id.substring(0, 6)}</td>
                             <td>${date}</td>
                             <td>${o.customerName}<br><small>${o.phone}</small></td>
                             <td><small>${items}</small></td>
                             <td>₹${o.totalAmount}</td>
-                            <td><span class="status-badge ${statusClass}">${o.status}</span></td>
                             <td>
-                                ${o.status !== 'DELIVERED' ?
-                                `<button class="btn btn-sm btn-outline" onclick="markDelivered('${o.id}')">Meta Delivered</button>` :
-                                'Completed'}
+                                <select class="edit-input" onchange="updateOrderStatus('${o.id}', this.value)" 
+                                    style="padding: 5px; font-size: 0.85rem; border-radius: 4px; ${getStatusColor(o.status)}">
+                                    ${statusOptions}
+                                </select>
+                            </td>
+                            <td>
+                                <button class="btn btn-outline btn-sm" onclick="viewOrderDetails('${o.id}')">View</button>
                             </td>
                         `;
                         tbody.appendChild(tr);
@@ -633,9 +690,79 @@
             }
         }
 
-        async function markDelivered(id) {
-            await fetch(`${API_ORDERS}/${id}/status?status=DELIVERED`, { method: 'PUT' });
-            loadAdminOrders();
+        function getStatusColor(status) {
+            if (status === 'PENDING') return 'border: 1px solid #ffcc00; color: #856404; background: #fff3cd;';
+            if (status === 'PROCESSING') return 'border: 1px solid #17a2b8; color: #0c5460; background: #d1ecf1;';
+            if (status === 'SHIPPED') return 'border: 1px solid #007bff; color: #004085; background: #cce5ff;';
+            if (status === 'DELIVERED') return 'border: 1px solid #28a745; color: #155724; background: #d4edda;';
+            if (status === 'CANCELLED') return 'border: 1px solid #dc3545; color: #721c24; background: #f8d7da;';
+            return '';
+        }
+
+        async function updateOrderStatus(id, newStatus) {
+            if (!confirm(`Update order status to ${newStatus}?`)) {
+                loadAdminOrders(); // Revert UI if cancelled
+                return;
+            }
+            try {
+                const res = await fetch(`${API_ORDERS}/${id}/status?status=${newStatus}`, { method: 'PUT' });
+                if (res.ok) {
+                    alert('Order status updated');
+                    loadAdminOrders();
+                } else {
+                    alert('Failed to update status');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error updating status');
+            }
+        }
+
+        async function viewOrderDetails(id) {
+            let order = allOrders.find(o => o.id === id);
+            if (!order) {
+                // Fallback fetch if not found in cache
+                try {
+                    const res = await fetch(`${API_ORDERS}/${id}`);
+                    order = await res.json();
+                } catch (e) {
+                    alert('Error loading details');
+                    return;
+                }
+            }
+
+            // Populate fields
+            document.getElementById('viewOrderId').textContent = '#' + order.id;
+            document.getElementById('viewOrderDate').textContent = new Date(order.createdAt).toLocaleString();
+            document.getElementById('viewOrderStatus').textContent = order.status;
+            document.getElementById('viewOrderStatus').className = `status-badge ${order.status === 'DELIVERED' ? 'status-delivered' : 'status-pending'}`;
+
+            document.getElementById('viewCustName').textContent = order.customerName;
+            document.getElementById('viewCustPhone').textContent = order.phone;
+            document.getElementById('viewCustEmail').textContent = order.email || 'N/A';
+
+            document.getElementById('viewOrderAddress').innerHTML = `
+                ${order.address}<br>
+                ${order.city} - ${order.pincode}
+            `;
+
+            document.getElementById('viewOrderTotal').textContent = '₹' + order.totalAmount;
+
+            const itemsBody = document.getElementById('viewOrderItems');
+            itemsBody.innerHTML = order.items.map(item => `
+                <tr>
+                    <td>${item.productName}</td>
+                    <td>${item.quantity}</td>
+                    <td>₹${item.price}</td>
+                    <td>₹${item.price * item.quantity}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('viewOrderModal').style.display = 'block';
+        }
+
+        function closeViewModal() {
+            document.getElementById('viewOrderModal').style.display = 'none';
         }
 
     </script>
