@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="css/style.css">
     <style>
         .admin-section {
-            padding: 40px 0;
+            padding: 120px 0 40px;
         }
 
         .admin-header {
@@ -19,6 +19,11 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
+            margin-top: 20px;
+        }
+
+        .page-title {
+            margin-top: 10px;
         }
 
         .admin-tabs {
@@ -214,15 +219,18 @@
                             </select>
                         </div>
                         <div class="form-group" style="grid-column: span 2;">
-                            <label class="form-label">Variant Pricing (Base Price shown on card)</label>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                <input type="number" class="form-input" id="price200g" placeholder="Price for 200g">
-                                <input type="number" class="form-input" id="price250g" placeholder="Price for 250g">
-                                <input type="number" class="form-input" id="price500g" placeholder="Price for 500g">
-                                <input type="number" class="form-input" id="price1kg" placeholder="Price for 1kg">
+                            <label class="form-label">Variant Pricing (Add multiple weight/price options)</label>
+                            <div id="variantPricingContainer">
+                                <!-- Dynamic rows added here -->
                             </div>
-                            <small style="color: var(--text-secondary);">Leave blank if variant not available. Enter
-                                generic price below for card display.</small>
+                            <button type="button" class="btn btn-outline btn-sm"
+                                onclick="addVariantRow('variantPricingContainer')"
+                                style="margin-top: 10px; width: auto;">+ Add Variant</button>
+                            <div style="margin-top: 10px;">
+                                <small style="color: var(--text-secondary);">Add specific prices for different weights
+                                    (e.g., 200g, 500g, 1kg). Base price below is used for display in the
+                                    catalog.</small>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Base/Display Price (₹)</label>
@@ -242,6 +250,12 @@
                                 style="padding: 10px;">
                             <input type="hidden" id="prodImage" value="images/logo.png">
                             <small style="color: var(--text-secondary);">Select a PNG or JPG image</small>
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label class="form-label">Key Ingredients & Benefits</label>
+                            <textarea class="form-input" id="prodIngredients"
+                                placeholder="e.g. Organic turmeric, Sun-dried, No additives"
+                                style="height: 100px; resize: vertical;"></textarea>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary btn-sm" style="margin-top: 15px;">Add Product</button>
@@ -277,16 +291,12 @@
                             </div>
                             <div class="form-group" style="grid-column: span 2;">
                                 <label class="form-label">Variant Pricing</label>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                    <input type="number" class="form-input" id="editPrice200g"
-                                        placeholder="Price for 200g">
-                                    <input type="number" class="form-input" id="editPrice250g"
-                                        placeholder="Price for 250g">
-                                    <input type="number" class="form-input" id="editPrice500g"
-                                        placeholder="Price for 500g">
-                                    <input type="number" class="form-input" id="editPrice1kg"
-                                        placeholder="Price for 1kg">
+                                <div id="editVariantPricingContainer">
+                                    <!-- Dynamic rows added here -->
                                 </div>
+                                <button type="button" class="btn btn-outline btn-sm"
+                                    onclick="addVariantRow('editVariantPricingContainer')"
+                                    style="margin-top: 10px; width: auto;">+ Add Variant</button>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Base/Display Price (₹)</label>
@@ -299,6 +309,11 @@
                             <div class="form-group">
                                 <label class="form-label">Description</label>
                                 <input type="text" class="form-input" id="editProdDesc" required>
+                            </div>
+                            <div class="form-group" style="grid-column: span 2;">
+                                <label class="form-label">Key Ingredients & Benefits</label>
+                                <textarea class="form-input" id="editProdIngredients"
+                                    style="height: 80px; resize: vertical;"></textarea>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">In Stock</label>
@@ -515,15 +530,12 @@
             }
 
             const weightPrices = {};
-            const p200 = document.getElementById('price200g').value;
-            const p250 = document.getElementById('price250g').value;
-            const p500 = document.getElementById('price500g').value;
-            const p1kg = document.getElementById('price1kg').value;
-
-            if (p200) weightPrices["200g"] = parseFloat(p200);
-            if (p250) weightPrices["250g"] = parseFloat(p250);
-            if (p500) weightPrices["500g"] = parseFloat(p500);
-            if (p1kg) weightPrices["1kg"] = parseFloat(p1kg);
+            const rows = document.querySelectorAll('#variantPricingContainer .variant-row');
+            rows.forEach(row => {
+                const w = row.querySelector('.variant-weight').value;
+                const p = row.querySelector('.variant-price').value;
+                if (w && p) weightPrices[w] = parseFloat(p);
+            });
 
             const newProd = {
                 name: document.getElementById('prodName').value,
@@ -533,8 +545,9 @@
                 description: document.getElementById('prodDesc').value,
                 imageUrl: imageUrl,
                 inStock: true,
-                rating: 5.0,
+                rating: 0.0,
                 reviewCount: 0,
+                ingredients: document.getElementById('prodIngredients').value,
                 weightPrices: weightPrices
             };
 
@@ -545,8 +558,8 @@
             });
 
             document.getElementById('addProductForm').reset();
+            document.getElementById('variantPricingContainer').innerHTML = ''; // Clear variants
             loadAdminProducts();
-            alert('Product Added');
         });
 
         // --- EDIT MODAL LOGIC ---
@@ -561,20 +574,17 @@
             document.getElementById('editProdPrice').value = product.price;
             document.getElementById('editProdWeight').value = product.weight;
             document.getElementById('editProdDesc').value = product.description;
+            document.getElementById('editProdIngredients').value = product.ingredients || '';
             document.getElementById('editProdInStock').checked = product.inStock;
 
             // Reset variant inputs
-            document.getElementById('editPrice200g').value = '';
-            document.getElementById('editPrice250g').value = '';
-            document.getElementById('editPrice500g').value = '';
-            document.getElementById('editPrice1kg').value = '';
+            document.getElementById('editVariantPricingContainer').innerHTML = '';
 
             // Populate variants if they exist
             if (product.weightPrices) {
-                if (product.weightPrices["200g"]) document.getElementById('editPrice200g').value = product.weightPrices["200g"];
-                if (product.weightPrices["250g"]) document.getElementById('editPrice250g').value = product.weightPrices["250g"];
-                if (product.weightPrices["500g"]) document.getElementById('editPrice500g').value = product.weightPrices["500g"];
-                if (product.weightPrices["1kg"]) document.getElementById('editPrice1kg').value = product.weightPrices["1kg"];
+                Object.entries(product.weightPrices).forEach(([weight, price]) => {
+                    addVariantRow('editVariantPricingContainer', weight, price);
+                });
             }
 
             document.getElementById('editProductModal').style.display = 'block';
@@ -590,15 +600,12 @@
             const id = document.getElementById('editProdId').value;
 
             const weightPrices = {};
-            const p200 = document.getElementById('editPrice200g').value;
-            const p250 = document.getElementById('editPrice250g').value;
-            const p500 = document.getElementById('editPrice500g').value;
-            const p1kg = document.getElementById('editPrice1kg').value;
-
-            if (p200) weightPrices["200g"] = parseFloat(p200);
-            if (p250) weightPrices["250g"] = parseFloat(p250);
-            if (p500) weightPrices["500g"] = parseFloat(p500);
-            if (p1kg) weightPrices["1kg"] = parseFloat(p1kg);
+            const rows = document.querySelectorAll('#editVariantPricingContainer .variant-row');
+            rows.forEach(row => {
+                const w = row.querySelector('.variant-weight').value;
+                const p = row.querySelector('.variant-price').value;
+                if (w && p) weightPrices[w] = parseFloat(p);
+            });
 
             const updatedProd = {
                 ...currentEditProduct,
@@ -607,6 +614,7 @@
                 price: parseFloat(document.getElementById('editProdPrice').value),
                 weight: document.getElementById('editProdWeight').value,
                 description: document.getElementById('editProdDesc').value,
+                ingredients: document.getElementById('editProdIngredients').value,
                 inStock: document.getElementById('editProdInStock').checked,
                 weightPrices: weightPrices
             };
@@ -619,7 +627,6 @@
 
             closeEditModal();
             loadAdminProducts();
-            alert('Product Updated Successfully');
         });
 
         // Close modal if clicked outside
@@ -645,6 +652,20 @@
 
         // Make orders accessible globally for the view function without re-fetching
         let allOrders = [];
+
+        // --- UNIVERSAL HELPERS ---
+        function addVariantRow(containerId, weight = '', price = '') {
+            const container = document.getElementById(containerId);
+            const row = document.createElement('div');
+            row.className = 'variant-row';
+            row.style = 'display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 10px; align-items: center;';
+            row.innerHTML = `
+                <input type="text" class="form-input variant-weight" placeholder="Weight (e.g. 500g)" value="${weight}" required>
+                <input type="number" class="form-input variant-price" placeholder="Price (₹)" value="${price}" required>
+                <button type="button" class="btn btn-outline btn-sm" onclick="this.parentElement.remove()" style="color: #ff6b6b; border-color: #ff6b6b; height: 42px;">&times;</button>
+            `;
+            container.appendChild(row);
+        }
 
         async function loadAdminOrders() {
             try {

@@ -98,7 +98,6 @@ function renderProductDetails(product) {
                         </button>
                         <div class="accordion-content" style="max-height: 500px;">
                             ${product.description}
-                            <p style="margin-top: 10px;">Our ${product.name} is made from the finest ingredients, sun-dried and ground to perfection to retain maximum flavor and aroma.</p>
                         </div>
                     </div>
                     <div class="accordion-item">
@@ -108,9 +107,10 @@ function renderProductDetails(product) {
                         </button>
                         <div class="accordion-content">
                             <ul style="padding-left: 20px; list-style-type: disc;">
-                                <li>Premium Spices: Rich in antioxidants.</li>
-                                <li>Natural Herbs: Aids digestion.</li>
-                                <li>No Preservatives: 100% natural and safe.</li>
+                                ${product.ingredients ?
+            product.ingredients.split(',').map(item => `<li>${item.trim()}</li>`).join('') :
+            `<li>100% Natural Spices</li><li>No artificial preservatives</li><li>Traditional home recipe</li>`
+        }
                             </ul>
                         </div>
                     </div>
@@ -131,9 +131,9 @@ function renderProductDetails(product) {
             <div class="reviews-header">
                 <div>
                      <h2 class="section-title" style="margin:0; font-size: 1.8rem;">Customer Reviews</h2>
-                     <div style="margin-top: 5px;">
-                        <span style="font-size: 2rem; font-weight: 700;">${product.rating || '0.0'}</span>
-                        <span class="rating-stars">${getStarRating(product.rating || 0)}</span>
+                     <div style="margin-top: 5px; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 2rem; font-weight: 700; line-height: 1;">${product.rating || '0.0'}</span>
+                        <span class="rating-stars" style="font-size: 1.2rem; display: flex; align-items: center;">${getStarRating(product.rating || 0)}</span>
                      </div>
                 </div>
                 <button class="btn btn-outline" onclick="openReviewModal()">Write a review</button>
@@ -289,11 +289,12 @@ async function submitReviewModal(e) {
         });
 
         if (response.ok) {
-            alert('Review submitted!');
+            showToast('Review submitted!');
             closeReviewModal();
             loadProductReviews(productId);
+            loadProductDetails(productId); // Refresh rating and info
         } else {
-            alert('Failed to submit review');
+            showToast('Failed to submit review');
         }
     } catch (error) {
         console.error('Error:', error);
