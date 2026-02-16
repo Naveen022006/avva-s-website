@@ -46,6 +46,12 @@ public class OrderController {
         return orderRepository.findByPhone(phone);
     }
 
+    // Get logged-in user's orders (by email)
+    @GetMapping("/my-orders")
+    public List<Order> getMyOrders(@RequestParam String email) {
+        return orderRepository.findByEmail(email);
+    }
+
     // Update order status (admin)
     @PutMapping("/{id}/status")
     public ResponseEntity<Order> updateOrderStatus(@PathVariable String id, @RequestParam String status) {

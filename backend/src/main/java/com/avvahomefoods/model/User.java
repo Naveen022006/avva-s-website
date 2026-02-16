@@ -11,6 +11,7 @@ public class User {
     private String password;
     private String name;
     private String role; // "USER", "ADMIN"
+    private String provider; // "LOCAL", "GOOGLE"
 
     public User() {
     }
@@ -60,5 +61,13 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
     }
 }

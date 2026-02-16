@@ -9,6 +9,7 @@
         href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         .auth-container {
             min-height: 100vh;
@@ -100,6 +101,12 @@
             display: none;
             text-align: center;
         }
+
+        #google-signin-button {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
     </style>
 </head>
 
@@ -118,12 +125,7 @@
                 <p class="auth-subtitle">Login to manage products and order history</p>
             </div>
 
-            <button type="button" class="btn btn-full btn-lg btn-google" onclick="alert('Google Sign In coming soon!')"
-                style="background: white; color: #333; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 500; margin-bottom: 20px;">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google"
-                    style="width: 20px; height: 20px;">
-                Sign in with Google
-            </button>
+            <div id="google-signin-button"></div>
 
             <div
                 style="display: flex; align-items: center; text-align: center; margin: 20px 0; color: var(--text-secondary); font-size: 0.85rem;">
@@ -160,6 +162,51 @@
 
     <script>
         const API_BASE = 'http://localhost:8080/api/auth';
+
+        // Initialize Google Sign-In
+        window.onload = function () {
+            google.accounts.id.initialize({
+                ***REMOVED***,
+                callback: handleGoogleSignIn
+            });
+
+            google.accounts.id.renderButton(
+                document.getElementById('google-signin-button'),
+                {
+                    theme: 'outline',
+                    size: 'large',
+                    width: 350,
+                    text: 'signin_with'
+                }
+            );
+        };
+
+        async function handleGoogleSignIn(response) {
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.style.display = 'none';
+
+            try {
+                const res = await fetch(`${API_BASE}/google-login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ credential: response.credential })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    localStorage.setItem('user', JSON.stringify(data));
+                    window.location.href = 'index.html';
+                } else {
+                    const errorText = await res.text();
+                    errorDiv.textContent = errorText || 'Google Sign-In failed';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Google Sign-In error:', error);
+                errorDiv.textContent = 'Error connecting to server';
+                errorDiv.style.display = 'block';
+            }
+        }
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
