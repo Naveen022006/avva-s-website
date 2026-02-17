@@ -76,14 +76,6 @@ function renderProductDetails(product) {
                     ${weightHtml}
                 </div>
 
-                <h4 style="margin-bottom: 10px;" class="reveal delay-400">Quantity</h4>
-                <div class="product-actions reveal delay-400" id="qtyControlContainer" style="justify-content: flex-start; margin-bottom: 30px;">
-                    <div class="qty-control" style="width: 120px;">
-                        <button class="qty-btn-card" onclick="adjustDetailQty(-1)">-</button>
-                        <span class="qty-val-card" id="detailQty">1</span>
-                        <button class="qty-btn-card" onclick="adjustDetailQty(1)">+</button>
-                    </div>
-                </div>
 
                 <div class="hide-mobile" style="display: none;">
                      ${product.inStock
@@ -174,6 +166,9 @@ function renderProductDetails(product) {
     updateStickyBar(currentPrice, currentWeight);
     document.getElementById('stickyCartBar').style.display = 'flex';
 
+    // Sync sticky bar with cart state
+    setTimeout(() => syncStickyBarWithCart(), 100);
+
     // Re-run scroll reveal to animate new elements
     if (typeof setupScrollReveal === 'function') {
         setTimeout(setupScrollReveal, 100);
@@ -216,31 +211,77 @@ function adjustDetailQty(change) {
     qtyEl.innerText = qty;
 }
 
-function addToCartCurrent() {
-    // Defaults if not set (initial state)
-    if (!selectedPrice) {
-        const priceText = document.getElementById('detailPrice').innerText.replace('₹', '');
-        selectedPrice = parseFloat(priceText);
-        // Try to get active chip
-        const activeChip = document.querySelector('.weight-chip.active');
-        selectedWeightText = activeChip ? activeChip.innerText : document.querySelector('.weight-display').innerText.replace('Weight: ', '');
-    }
-
+// Handle sticky Add to Cart button click
+function handleStickyAddToCart() {
+    // Get product details
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
     const name = document.querySelector('.pd-title').innerText;
     const img = document.querySelector('.pd-image').src;
-    const qty = parseInt(document.getElementById('detailQty').innerText);
 
-    // Add logic to handle quantity in addToCart (currently adds 1)
-    // For now we loop or modify app.js. 
-    // Let's just call addToCart multiple times or assume 1 for simple visual check, 
-    // BUT user wants it "according to mobile" so functionality matters.
-    // app.js addToCart takes (id, name, price, weight, image) and adds 1.
-    // We should loop or modify. For safety, let's just add once for now properly.
+    // Add 1 item to cart
+    addToCart(id, name, selectedPrice, selectedWeightText, img, 1);
 
-    addToCart(id, name, selectedPrice, selectedWeightText, img, qty);
-    // If we want to support quantity > 1, we need to update app.js addToCart to accept quantity.
+    // Toggle UI: hide button, show quantity control
+    document.getElementById('stickyAddBtn').style.display = 'none';
+    document.getElementById('stickyQtyControl').style.display = 'flex';
+    document.getElementById('stickyQty').innerText = '1';
+}
+
+// Adjust quantity in sticky bar
+function adjustStickyQty(change) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+    const name = document.querySelector('.pd-title').innerText;
+    const img = document.querySelector('.pd-image').src;
+
+    const qtyEl = document.getElementById('stickyQty');
+    let currentQty = parseInt(qtyEl.innerText);
+    let newQty = currentQty + change;
+
+    if (newQty < 1) {
+        // Remove from cart and show Add to Cart button again
+        removeFromCart(id, selectedWeightText);
+        document.getElementById('stickyAddBtn').style.display = 'block';
+        document.getElementById('stickyQtyControl').style.display = 'none';
+        return;
+    }
+
+    // Update cart
+    if (change > 0) {
+        addToCart(id, name, selectedPrice, selectedWeightText, img, 1);
+    } else {
+        removeFromCart(id, selectedWeightText);
+    }
+
+    // Update display
+    qtyEl.innerText = newQty;
+}
+
+// Check cart state on page load and update sticky bar accordingly
+function syncStickyBarWithCart() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+
+    // Get quantity from cart
+    const qty = getCartItemQuantity(id, selectedWeightText);
+
+    if (qty > 0) {
+        // Show quantity control
+        document.getElementById('stickyAddBtn').style.display = 'none';
+        document.getElementById('stickyQtyControl').style.display = 'flex';
+        document.getElementById('stickyQty').innerText = qty;
+    } else {
+        // Show Add to Cart button
+        document.getElementById('stickyAddBtn').style.display = 'block';
+        document.getElementById('stickyQtyControl').style.display = 'none';
+    }
+}
+
+function addToCartCurrent() {
+    // This function is no longer used since we removed the desktop button
+    // Keeping it for compatibility
+    handleStickyAddToCart();
 }
 
 async function loadProductReviews(productId) {

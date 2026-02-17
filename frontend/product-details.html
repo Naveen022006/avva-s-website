@@ -188,7 +188,13 @@
             <span class="sticky-price" id="stickyPrice">₹0</span>
             <span class="sticky-weight" id="stickyWeight"></span>
         </div>
-        <button class="btn btn-primary btn-full" id="stickyAddBtn" onclick="triggerAddToCart()">Add to Cart</button>
+        <button class="btn btn-primary btn-full" id="stickyAddBtn" onclick="handleStickyAddToCart()">Add to
+            Cart</button>
+        <div class="qty-control" id="stickyQtyControl" style="display: none; width: 120px;">
+            <button class="qty-btn-card" onclick="adjustStickyQty(-1)">-</button>
+            <span class="qty-val-card" id="stickyQty">1</span>
+            <button class="qty-btn-card" onclick="adjustStickyQty(1)">+</button>
+        </div>
     </div>
 
     <!-- Review Form Modal -->
