@@ -77,7 +77,7 @@ function renderProductDetails(product) {
                 </div>
 
                 <h4 style="margin-bottom: 10px;" class="reveal delay-400">Quantity</h4>
-                <div class="product-actions reveal delay-400" style="justify-content: flex-start; margin-bottom: 30px;">
+                <div class="product-actions reveal delay-400" id="qtyControlContainer" style="justify-content: flex-start; margin-bottom: 30px;">
                     <div class="qty-control" style="width: 120px;">
                         <button class="qty-btn-card" onclick="adjustDetailQty(-1)">-</button>
                         <span class="qty-val-card" id="detailQty">1</span>
@@ -85,8 +85,11 @@ function renderProductDetails(product) {
                     </div>
                 </div>
 
-                <div class="hide-mobile">
-                     <button class="btn btn-primary btn-lg" style="width: 100%; margin-bottom: 15px;" onclick="addToCartCurrent()">Add to Cart</button>
+                <div class="hide-mobile" style="display: none;">
+                     ${product.inStock
+            ? `<button class="btn btn-primary btn-lg" style="width: 100%; margin-bottom: 15px;" onclick="addToCartCurrent()">Add to Cart</button>`
+            : `<button class="btn btn-primary btn-lg btn-disabled" style="width: 100%; margin-bottom: 15px;">Out of Stock</button>`
+        }
                 </div>
 
                 <!-- Accordion Sections -->
@@ -146,6 +149,26 @@ function renderProductDetails(product) {
     `;
 
     container.innerHTML = html;
+
+    // Update Sticky Bar Button
+    const stickyBtn = document.getElementById('stickyAddBtn');
+    if (stickyBtn) {
+        if (product.inStock) {
+            stickyBtn.textContent = 'Add to Cart';
+            stickyBtn.classList.remove('btn-disabled');
+            stickyBtn.disabled = false;
+        } else {
+            stickyBtn.textContent = 'Out of Stock';
+            stickyBtn.classList.add('btn-disabled');
+            stickyBtn.disabled = true;
+        }
+    }
+
+    // Hide Quantity Control if Out of Stock
+    const qtyContainer = document.getElementById('qtyControlContainer');
+    if (qtyContainer) {
+        qtyContainer.style.display = product.inStock ? 'flex' : 'none';
+    }
 
     // init sticky bar
     updateStickyBar(currentPrice, currentWeight);

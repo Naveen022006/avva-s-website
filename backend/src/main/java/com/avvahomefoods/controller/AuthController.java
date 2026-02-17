@@ -27,8 +27,15 @@ public class AuthController {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    @Value("${google.client.id:251035700377-n7q8hh93m1mucmrkp9njcef5kq29c63u.apps.googleusercontent.com}")
+    @Value("${google.client.id}")
     private String googleClientId;
+
+    @GetMapping("/google-client-id")
+    public ResponseEntity<Map<String, String>> getGoogleClientId() {
+        Map<String, String> response = new HashMap<>();
+        response.put("clientId", googleClientId);
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
