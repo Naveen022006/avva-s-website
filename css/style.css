@@ -1648,12 +1648,23 @@ img {
 }
 
 .social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     padding: 8px 16px;
     background: var(--bg-elevated);
     border: 1px solid var(--border-subtle);
     border-radius: 10px;
     font-size: 0.85rem;
     transition: var(--transition-fast);
+    text-decoration: none;
+    color: var(--text-primary);
+}
+
+.social-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
 }
 
 .social-link:hover {
