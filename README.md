@@ -73,3 +73,37 @@ nohup python3 -m http.server 8000 > frontend.log 2>&1 &
 *   **Port 8080 in use**: If the backend fails to start, check if another application is using port 8080.
 *   **Missing ID**: If Google Sign-in doesn't load, verify your `GOOGLE_CLIENT_ID` is set in the environment or `.env` file.
 
+---
+
+## 🐳 Docker Deployment
+
+You can run the entire application (Backend + Frontend + Database) using Docker.
+
+### 1. Prerequisites
+- Docker and Docker Compose installed.
+
+### 2. Configuration
+Create a `.env` file in the root directory (same level as `docker-compose.yml`) with your Google Client ID:
+```env
+GOOGLE_CLIENT_ID=your_google_client_id_here
+```
+
+### 3. Build and Run
+Open a terminal in the project root and run:
+```bash
+docker-compose up --build
+```
+
+- The application will be available at: `http://localhost:8080`
+- The backend API and frontend are both served on this port.
+- MongoDB will be running in a separate container on port `27017`.
+
+### 4. Stop the Application
+Press `Ctrl+C` to stop the logs, then run:
+```bash
+docker-compose down
+```
+For a complete cleanup (removing volumes):
+```bash
+docker-compose down -v
+```
