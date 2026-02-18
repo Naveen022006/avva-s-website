@@ -210,7 +210,35 @@
         <!-- PRODUCTS PANEL -->
         <div id="productsPanel" class="admin-panel active">
 
+            <!-- Store Settings Card -->
+            <div class="admin-card" style="margin-bottom: 20px; border-left: 3px solid var(--primary);">
+                <h3 style="margin-bottom: 15px;">🚚 Store Settings — Delivery Charges</h3>
+                <div class="form-grid"
+                    style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; align-items: end;">
+                    <div class="form-group">
+                        <label class="form-label">Delivery Charge (₹)</label>
+                        <input type="number" class="form-input" id="settingDeliveryCharge" min="0"
+                            placeholder="e.g. 50">
+                        <small style="color: var(--text-secondary);">Charged when order is below free-delivery
+                            threshold</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Free Delivery Above (₹)</label>
+                        <input type="number" class="form-input" id="settingFreeThreshold" min="0"
+                            placeholder="e.g. 500">
+                        <small style="color: var(--text-secondary);">Orders above this amount get free delivery</small>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: flex-end;">
+                        <button class="btn btn-primary btn-sm" onclick="saveDeliverySettings()"
+                            style="width: 100%; height: 45px;">Save Settings</button>
+                    </div>
+                </div>
+                <div id="settingsSavedMsg" style="display:none; margin-top: 10px; color: #28a745; font-weight: 600;">✅
+                    Settings saved! Changes will reflect on the order page immediately.</div>
+            </div>
+
             <!-- Add Product Form -->
+
             <div class="admin-card">
                 <h3>Add New Product</h3>
                 <form id="addProductForm">
@@ -450,7 +478,30 @@
             checkAdminAuth();
             loadAdminProducts();
             loadAdminOrders();
+            loadDeliverySettings();
         });
+
+        // DELIVERY SETTINGS
+        function loadDeliverySettings() {
+            const charge = localStorage.getItem('avvaDeliveryCharge') || '50';
+            const threshold = localStorage.getItem('avvaFreeDeliveryThreshold') || '500';
+            document.getElementById('settingDeliveryCharge').value = charge;
+            document.getElementById('settingFreeThreshold').value = threshold;
+        }
+
+        function saveDeliverySettings() {
+            const charge = document.getElementById('settingDeliveryCharge').value;
+            const threshold = document.getElementById('settingFreeThreshold').value;
+            if (charge === '' || threshold === '') {
+                alert('Please fill in both fields.');
+                return;
+            }
+            localStorage.setItem('avvaDeliveryCharge', charge);
+            localStorage.setItem('avvaFreeDeliveryThreshold', threshold);
+            const msg = document.getElementById('settingsSavedMsg');
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 3000);
+        }
 
         // TABS
         function switchTab(tabName) {
