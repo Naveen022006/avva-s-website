@@ -11,11 +11,7 @@ let prevY = mouseY;
 
 let angle = 0;
 
-const speed = 0.08; // smoothness (lower = smoother)
-
-// TIP OFFSET (adjust if needed)
-const offsetX = 6;
-const offsetY = 6;
+const speed = 0.08; // smoothness
 
 if (cursor) {
 
@@ -26,19 +22,26 @@ if (cursor) {
 
     function animate() {
 
-        // Smooth follow (lerp)
+        // Smooth follow
         currentX += (mouseX - currentX) * speed;
         currentY += (mouseY - currentY) * speed;
 
-        // Calculate direction based on smooth movement
+        // Calculate movement direction
         const dx = currentX - prevX;
         const dy = currentY - prevY;
 
         if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
-            angle = Math.atan2(dy, dx) * (180 / Math.PI);
+            // Adjust by -90 because arrow points UP by default
+            angle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
         }
 
-        // Apply position + rotation
+        const rad = angle * (Math.PI / 180);
+
+        const tipDistance = cursor.offsetHeight / 2;
+
+        const offsetX = Math.sin(rad) * tipDistance;
+        const offsetY = -Math.cos(rad) * tipDistance;
+
         cursor.style.transform = `
             translate(${currentX - offsetX}px, ${currentY - offsetY}px)
             rotate(${angle}deg)
@@ -51,7 +54,4 @@ if (cursor) {
     }
 
     animate();
-
-} else {
-    console.warn("Custom cursor element .cursor not found.");
 }
