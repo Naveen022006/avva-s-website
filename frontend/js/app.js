@@ -440,11 +440,13 @@ function loadCartPage() {
 
         // Update summary
         const subtotal = getCartSubtotal();
-        const delivery = subtotal >= 500 ? 0 : 50;
+        const deliveryFee = parseInt(localStorage.getItem('avvaDeliveryCharge') || '50');
+        const freeThreshold = parseInt(localStorage.getItem('avvaFreeDeliveryThreshold') || '500');
+        const delivery = subtotal >= freeThreshold ? 0 : deliveryFee;
         const total = subtotal + delivery;
 
         document.getElementById('subtotal').textContent = `₹${subtotal} `;
-        document.getElementById('deliveryCharge').textContent = delivery === 0 ? 'FREE' : `₹${delivery} `;
+        document.getElementById('deliveryCharge').textContent = delivery === 0 ? `FREE (orders above ₹${freeThreshold})` : `₹${delivery} `;
         document.getElementById('totalAmount').textContent = `₹${total} `;
     }
 }
@@ -464,7 +466,9 @@ function setupOrderForm() {
         }
 
         const subtotal = getCartSubtotal();
-        const delivery = subtotal >= 500 ? 0 : 50;
+        const deliveryFee = parseInt(localStorage.getItem('avvaDeliveryCharge') || '50');
+        const freeThreshold = parseInt(localStorage.getItem('avvaFreeDeliveryThreshold') || '500');
+        const delivery = subtotal >= freeThreshold ? 0 : deliveryFee;
         const totalAmount = subtotal + delivery;
 
         const orderData = {
