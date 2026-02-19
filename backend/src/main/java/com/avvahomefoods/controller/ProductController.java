@@ -60,7 +60,19 @@ public class ProductController {
             // We want .../food/frontend/images
 
             // Hardcoding based on the user's environment for reliability in this session
-            String uploadDir = "c:/Users/Naveen K/Desktop/sample 2/food/frontend/images/";
+            // Dynamic path resolution
+            String projectRoot = System.getProperty("user.dir"); // This lands in 'backend' usually
+            // We need to go up one level to 'food' then to 'frontend/images'
+            // But we must be careful about where the jar/cmd is run from.
+            // Assuming run from 'backend' folder as per README instructions:
+            java.nio.file.Path uploadPath = java.nio.file.Paths.get(projectRoot).getParent().resolve("frontend")
+                    .resolve("images");
+
+            if (!java.nio.file.Files.exists(uploadPath)) {
+                java.nio.file.Files.createDirectories(uploadPath);
+            }
+
+            String uploadDir = uploadPath.toString() + java.io.File.separator;
 
             // Generate unique filename to avoid collisions
             String originalFilename = file.getOriginalFilename();

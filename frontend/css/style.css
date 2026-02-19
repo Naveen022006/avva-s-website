@@ -62,7 +62,7 @@
     --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Typography */
-    --font-display: 'Fraunces', serif;
+    --font-display: 'Comfortaa', cursive;
     --font-body: 'Manrope', sans-serif;
     --font-alt: 'Manrope', sans-serif;
 }
@@ -224,8 +224,10 @@ img {
 }
 
 .logo-text {
-    font-family: 'Cooper Black', serif;
+    font-family: 'Great Vibes', cursive;
     color: var(--text-primary);
+    font-size: 1.8rem;
+    letter-spacing: 0.5px;
 }
 
 .nav-links {
