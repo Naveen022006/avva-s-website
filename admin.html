@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Avva's Home Foods</title>
     <link
-        href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=3">
     <link rel="stylesheet" href="css/cursor.css">
     <style>
         .admin-section {
@@ -205,6 +205,7 @@
         <div class="admin-tabs">
             <div class="admin-tab active" onclick="switchTab('products')">Manage Products</div>
             <div class="admin-tab" onclick="switchTab('orders')">Monitor Orders</div>
+            <div class="admin-tab" onclick="switchTab('categories')">Manage Categories</div>
         </div>
 
         <!-- PRODUCTS PANEL -->
@@ -213,8 +214,7 @@
             <!-- Store Settings Card -->
             <div class="admin-card" style="margin-bottom: 20px; border-left: 3px solid var(--primary);">
                 <h3 style="margin-bottom: 15px;">🚚 Store Settings — Delivery Charges</h3>
-                <div class="form-grid"
-                    style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; align-items: end;">
+                <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                     <div class="form-group">
                         <label class="form-label">Delivery Charge (₹)</label>
                         <input type="number" class="form-input" id="settingDeliveryCharge" min="0"
@@ -228,7 +228,8 @@
                             placeholder="e.g. 500">
                         <small style="color: var(--text-secondary);">Orders above this amount get free delivery</small>
                     </div>
-                    <div class="form-group" style="display: flex; align-items: flex-end;">
+                    <div class="form-group">
+                        <label class="form-label">&nbsp;</label>
                         <button class="btn btn-primary btn-sm" onclick="saveDeliverySettings()"
                             style="width: 100%; height: 45px;">Save Settings</button>
                     </div>
@@ -320,9 +321,10 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Category</label>
-                                <select class="form-input" id="editProdCategory">
+                                <select class="form-input" id="editProdCategory" required>
                                     <option value="Masala Powders">Masala Powders</option>
                                     <option value="Pure Spices">Pure Spices</option>
+                                    <option value="Rice Mixes">Rice Mixes</option>
                                     <option value="Special Blends">Special Blends</option>
                                 </select>
                             </div>
@@ -413,6 +415,48 @@
                 </div>
             </div>
         </div>
+
+        <!-- CATEGORIES PANEL -->
+        <div id="categoriesPanel" class="admin-panel">
+            <div class="admin-card">
+                <h3>Add New Category</h3>
+                <form id="addCategoryForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Category Name</label>
+                            <input type="text" class="form-input" id="catName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <input type="text" class="form-input" id="catDesc" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; height: 45px;">Add
+                                Category</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="admin-card">
+                <h3>Current Categories</h3>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoriesTableBody">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
         <!-- View Order Modal -->
         <div id="viewOrderModal" class="modal"
             style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
@@ -478,6 +522,10 @@
             checkAdminAuth();
             loadAdminProducts();
             loadAdminOrders();
+            checkAdminAuth();
+            loadAdminProducts();
+            loadAdminOrders();
+            loadCategories();
             loadDeliverySettings();
         });
 
@@ -511,9 +559,12 @@
             if (tabName === 'products') {
                 document.querySelector('.admin-tabs').children[0].classList.add('active');
                 document.getElementById('productsPanel').classList.add('active');
-            } else {
+            } else if (tabName === 'orders') {
                 document.querySelector('.admin-tabs').children[1].classList.add('active');
                 document.getElementById('ordersPanel').classList.add('active');
+            } else {
+                document.querySelector('.admin-tabs').children[2].classList.add('active');
+                document.getElementById('categoriesPanel').classList.add('active');
             }
         }
 
@@ -532,8 +583,25 @@
             window.location.href = 'index.html';
         }
 
+        // --- AUTH UTILS ---
+        function getAuthHeaders() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': user && user.token ? `Bearer ${user.token}` : ''
+            };
+        }
+
+        function getAuthHeadersMultipart() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            return {
+                'Authorization': user && user.token ? `Bearer ${user.token}` : ''
+            };
+        }
+
         // --- PRODUCTS LOGIC ---
         const API_PROD = 'http://localhost:8080/api/products';
+        const API_CATS = 'http://localhost:8080/api/categories';
 
         async function loadAdminProducts() {
             try {
@@ -579,6 +647,7 @@
                 try {
                     const uploadRes = await fetch(`${API_PROD}/upload`, {
                         method: 'POST',
+                        headers: getAuthHeadersMultipart(),
                         body: formData
                     });
                     if (uploadRes.ok) {
@@ -613,7 +682,7 @@
 
             await fetch(API_PROD, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify(newProd)
             });
 
@@ -681,7 +750,7 @@
 
             await fetch(`${API_PROD}/${id}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify(updatedProd)
             });
 
@@ -703,7 +772,7 @@
 
         async function deleteProduct(id) {
             if (!confirm('Are you sure?')) return;
-            await fetch(`${API_PROD}/${id}`, { method: 'DELETE' });
+            await fetch(`${API_PROD}/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
             loadAdminProducts();
         }
 
@@ -712,6 +781,72 @@
 
         // Make orders accessible globally for the view function without re-fetching
         let allOrders = [];
+
+        // --- CATEGORIES LOGIC ---
+        async function loadCategories() {
+            try {
+                const res = await fetch(API_CATS);
+                const cats = await res.json();
+                const tbody = document.getElementById('categoriesTableBody');
+                tbody.innerHTML = '';
+
+                cats.forEach(c => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${c.name}</td>
+                        <td>${c.description}</td>
+                        <td>
+                            <button class="btn btn-outline btn-sm" onclick="deleteCategory('${c.id}')" style="color: #ff6b6b; border-color: #ff6b6b;">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                populateCategoryDropdowns(cats);
+            } catch (e) {
+                console.error("Err loading categories", e);
+            }
+        }
+
+        function populateCategoryDropdowns(cats) {
+            const options = cats.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+            const prodSelect = document.getElementById('prodCategory');
+            const editSelect = document.getElementById('editProdCategory');
+
+            // Allow selecting current value if not in list (edge case) or set default
+            if (prodSelect) prodSelect.innerHTML = options;
+            if (editSelect) {
+                const currentVal = editSelect.value;
+                editSelect.innerHTML = options;
+                if (currentVal) editSelect.value = currentVal;
+            }
+        }
+
+        document.getElementById('addCategoryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newCat = {
+                name: document.getElementById('catName').value,
+                description: document.getElementById('catDesc').value
+            };
+
+            const res = await fetch(API_CATS, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(newCat)
+            });
+
+            if (res.ok) {
+                document.getElementById('addCategoryForm').reset();
+                loadCategories();
+            } else {
+                alert('Error adding category');
+            }
+        });
+
+        async function deleteCategory(id) {
+            if (!confirm('Delete this category?')) return;
+            await fetch(`${API_CATS}/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+            loadCategories();
+        }
 
         // --- UNIVERSAL HELPERS ---
         function addVariantRow(containerId, weight = '', price = '') {
@@ -759,8 +894,11 @@
                                     ${statusOptions}
                                 </select>
                             </td>
-                            <td>
+                            <td style="display: flex; gap: 6px; align-items: center;">
                                 <button class="btn btn-outline btn-sm" onclick="viewOrderDetails('${o.id}')">View</button>
+                                <button class="btn btn-sm" onclick="deleteOrder('${o.id}')" 
+                                    style="background: transparent; border: 1px solid #dc3545; color: #dc3545; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-size: 0.8rem;" 
+                                    title="Delete Order">🗑️ Delete</button>
                             </td>
                         `;
                         tbody.appendChild(tr);
@@ -781,14 +919,10 @@
         }
 
         async function updateOrderStatus(id, newStatus) {
-            if (!confirm(`Update order status to ${newStatus}?`)) {
-                loadAdminOrders(); // Revert UI if cancelled
-                return;
-            }
             try {
-                const res = await fetch(`${API_ORDERS}/${id}/status?status=${newStatus}`, { method: 'PUT' });
+                const res = await fetch(`${API_ORDERS}/${id}/status?status=${newStatus}`, { method: 'PUT', headers: getAuthHeaders() });
                 if (res.ok) {
-                    alert('Order status updated');
+                    // Update the dropdown color in-place without full reload
                     loadAdminOrders();
                 } else {
                     alert('Failed to update status');
@@ -796,6 +930,22 @@
             } catch (e) {
                 console.error(e);
                 alert('Error updating status');
+            }
+        }
+
+        async function deleteOrder(id) {
+            try {
+                const res = await fetch(`${API_ORDERS}/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+                if (res.ok || res.status === 204) {
+                    // Remove from global array and re-render without full fetch
+                    allOrders = allOrders.filter(o => o.id !== id);
+                    loadAdminOrders();
+                } else {
+                    alert('Failed to delete order.');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error deleting order. Make sure backend is running.');
             }
         }
 

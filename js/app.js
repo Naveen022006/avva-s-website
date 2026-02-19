@@ -345,6 +345,34 @@ async function loadFeaturedProducts() {
     container.innerHTML = featured.map(renderProductCard).join('');
 }
 
+// ==================== LOAD CATEGORIES FOR FILTERS ====================
+async function loadCategoriesForFilters() {
+    const tabsContainer = document.getElementById('filterTabs');
+    if (!tabsContainer) return;
+
+    try {
+        // Use API_BASE which is defined at the top
+        const res = await fetch(`${API_BASE}/categories`);
+        if (!res.ok) return;
+
+        const cats = await res.json();
+        if (!cats || cats.length === 0) return;
+
+        // Rebuild tabs
+        tabsContainer.innerHTML = '<button class="filter-tab active" data-category="all">All Products</button>';
+
+        cats.forEach(c => {
+            const btn = document.createElement('button');
+            btn.className = 'filter-tab';
+            btn.dataset.category = c.name;
+            btn.textContent = c.name;
+            tabsContainer.appendChild(btn);
+        });
+    } catch (e) {
+        console.warn("Could not load categories for filters, using defaults.");
+    }
+}
+
 // ==================== LOAD ALL PRODUCTS (Products page) ====================
 let allProducts = [];
 
@@ -352,6 +380,9 @@ async function loadAllProducts() {
     const container = document.getElementById('productsGrid');
     const emptyState = document.getElementById('emptyState');
     if (!container) return;
+
+    // Load dynamic categories for filters
+    await loadCategoriesForFilters();
 
     allProducts = await fetchProducts();
     renderFilteredProducts(allProducts);
@@ -408,6 +439,15 @@ function loadCartPage() {
     const orderFormWrapper = document.getElementById('orderFormWrapper');
 
     if (!cartItemsContainer) return;
+
+    // Pre-fill email from logged-in user
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+        const emailField = document.getElementById('email');
+        if (emailField && !emailField.value) {
+            emailField.value = user.email || user.username || '';
+        }
+    }
 
     const cart = getCart();
 
@@ -498,19 +538,29 @@ function setupOrderForm() {
 
             if (response.ok) {
                 const order = await response.json();
+                // Clear cart only on success
+                localStorage.removeItem('avvaCart');
+                updateCartCount();
                 showOrderSuccess(order.id);
             } else {
                 throw new Error('API error');
             }
         } catch (error) {
-            // Fallback: show success with mock order ID
+            // Fallback: save order to localStorage so it appears in My Orders
             const mockId = 'AVH-' + Date.now().toString().slice(-6);
+            const fallbackOrders = JSON.parse(localStorage.getItem('avvaLocalOrders') || '[]');
+            fallbackOrders.unshift({
+                ...orderData,
+                id: mockId,
+                status: 'PENDING',
+                createdAt: new Date().toISOString()
+            });
+            localStorage.setItem('avvaLocalOrders', JSON.stringify(fallbackOrders));
+            // Clear cart
+            localStorage.removeItem('avvaCart');
+            updateCartCount();
             showOrderSuccess(mockId);
         }
-
-        // Clear cart
-        localStorage.removeItem('avvaCart');
-        updateCartCount();
     });
 }
 
