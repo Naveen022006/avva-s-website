@@ -2086,6 +2086,12 @@ img {
         justify-content: center;
     }
 
+    /* Increase WhatsApp logo size on mobile */
+    .btn .social-icon {
+        width: 32px;
+        height: 32px;
+    }
+
     /* Forms */
     .form-row {
         grid-template-columns: 1fr;
