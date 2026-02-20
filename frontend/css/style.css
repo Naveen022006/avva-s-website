@@ -2090,7 +2090,7 @@ img {
     /* Increase WhatsApp logo size on mobile */
     .btn .social-icon {
         width: 60px;
-        height: 90px;
+        height: 70px;
         filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
     }
 
