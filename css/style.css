@@ -2089,8 +2089,8 @@ img {
 
     /* Increase WhatsApp logo size on mobile */
     .btn .social-icon {
-        width: 50px;
-        height: 50px;
+        width: 43px;
+        height: 43px;
         filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
     }
 
