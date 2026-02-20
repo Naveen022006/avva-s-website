@@ -2076,7 +2076,7 @@ img {
         max-width: 100%;
     }
 
-    .cta-buttons {
+    .hero-cta {
         flex-direction: column;
         width: 100%;
     }
@@ -2086,10 +2086,12 @@ img {
         justify-content: center;
     }
 
+
     /* Increase WhatsApp logo size on mobile */
     .btn .social-icon {
-        width: 50px;
-        height: 50px;
+        width: 40px;
+        height: 40px;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
     }
 
     /* Forms */
