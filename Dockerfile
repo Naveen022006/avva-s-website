@@ -14,7 +14,7 @@ COPY frontend ./src/main/resources/static
 RUN mvn clean package -DskipTests -q
 
 # Run Stage
-FROM eclipse-temurin:17-jdk-slim
+FROM amazoncorretto:17-al2-jdk
 WORKDIR /app
 
 # Set environment variables for production
