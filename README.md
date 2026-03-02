@@ -80,15 +80,23 @@ nohup python3 -m http.server 8000 > frontend.log 2>&1 &
 You can run the entire application (Backend + Frontend + Database) using Docker.
 
 ### 1. Prerequisites
+- Git installed.
 - Docker and Docker Compose installed.
 
-### 2. Configuration
+### 2. Clone the Repository
+Open a terminal and run:
+```bash
+git clone https://github.com/Naveen022006/avva-s-website.git
+cd avva-s-website
+```
+
+### 3. Configuration
 Create a `.env` file in the root directory (same level as `docker-compose.yml`) with your Google Client ID:
 ```env
 GOOGLE_CLIENT_ID=your_google_client_id_here
 ```
 
-### 3. Build and Run
+### 4. Build and Run
 Open a terminal in the project root and run:
 ```bash
 docker-compose up --build
@@ -98,7 +106,7 @@ docker-compose up --build
 - The backend API and frontend are both served on this port.
 - MongoDB will be running in a separate container on port `27017`.
 
-### 4. Stop the Application
+### 5. Stop the Application
 Press `Ctrl+C` to stop the logs, then run:
 ```bash
 docker-compose down
