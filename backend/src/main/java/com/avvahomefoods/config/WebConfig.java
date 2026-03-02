@@ -1,23 +1,11 @@
 package com.avvahomefoods.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+// This file is intentionally left empty.
+// CORS is configured centrally in SecurityConfig.java via corsConfigurationSource().
+// Having two separate CORS configurations causes request failures in Spring Security.
 @Configuration
 public class WebConfig {
-
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**")
-                        .allowedOrigins("*")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*");
-            }
-        };
-    }
+    // CORS is handled by SecurityConfig
 }
