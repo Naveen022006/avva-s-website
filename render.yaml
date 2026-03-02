@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: avva-home-foods
+    env: docker
+    dockerfilePath: ./Dockerfile
+    port: 8080
+    plan: free
+    memoryMB: 512
+    envVars:
+      - key: SPRING_DATA_MONGODB_URI
+        scope: build,runtime
+        value: ${MONGODB_URI}
+      - key: GOOGLE_CLIENT_ID
+        scope: build,runtime
+        value: ${GOOGLE_CLIENT_ID}
+      - key: SERVER_SERVLET_CONTEXT_PATH
+        value: /
+      - key: RENDER_EXTERNAL_HOSTNAME
+        fromService:
+          type: web
+          name: avva-home-foods
+          property: host
+    region: oregon
+    autoDeployFromGitHub: true
+    maxShutdownDelaySeconds: 30

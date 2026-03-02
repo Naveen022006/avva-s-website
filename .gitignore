@@ -1,5 +1,49 @@
+# Build and dependency directories
 **/target/
+/build/
+/dist/
+node_modules/
+.gradle/
+
+# IDE and editor configurations
 **/.DS_Store
 **/.vscode/
 **/.idea/
+*.iml
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+
+# Environment and secrets
 **/.env
+.env.local
+.env.*.local
+.env.render
+
+# Logs
+*.log
+logs/
+
+# Database and temp files
+*.db
+*.sqlite
+.mvn/
+
+# OS specific
+Thumbs.db
+.DS_Store
+
+# Generated files
+*.class
+*.jar
+.mvn/wrapper/maven-wrapper.jar
+
+# Test coverage
+/coverage/
+*.lcov
+
+# IDE workspace
+.vscode/workspace.json

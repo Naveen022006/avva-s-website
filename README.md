@@ -1,4 +1,22 @@
-# Avva's Home Foods - Windows Setup Guide
+# Avva's Home Foods - Setup & Deployment Guide
+
+## 🌐 Cloud Deployment (Render) - RECOMMENDED
+
+**For production deployment, use Render Cloud Platform:**
+
+→ **[Complete Render Deployment Guide](./RENDER_DEPLOYMENT.md)**
+
+Quick steps:
+1. Push code to GitHub
+2. Create account at [render.com](https://render.com)
+3. Set environment variables:
+   - `SPRING_DATA_MONGODB_URI` (MongoDB Atlas URI)
+   - `GOOGLE_CLIENT_ID` (Google OAuth)
+4. Deploy from GitHub - Render auto-detects `render.yaml`
+
+Deploy Status: ✅ **Ready for Production**
+
+---
 
 ## 🔐 Configuration & Security
 

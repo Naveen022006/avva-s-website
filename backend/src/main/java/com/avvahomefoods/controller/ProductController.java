@@ -1,13 +1,23 @@
 package com.avvahomefoods.controller;
 
-import com.avvahomefoods.model.Product;
-import com.avvahomefoods.repository.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.avvahomefoods.model.Product;
+import com.avvahomefoods.repository.ProductRepository;
 
 @RestController
 @RequestMapping("/api/products")
@@ -54,25 +64,24 @@ public class ProductController {
     public ResponseEntity<String> uploadImage(
             @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
         try {
-            // Absolute path to frontend/images
-            // Note: In diverse environments, relative paths are tricky.
-            // Given the known structure: backend is at .../food/backend
-            // We want .../food/frontend/images
+            // Use Spring's resource loader for environment-agnostic path
+            // For Docker/Render: Images are served from src/main/resources/static/images
+            // For local dev: Can use frontend/images
+            
+            String uploadDir = "src/main/resources/static/images/";
+            java.nio.file.Path uploadPath = java.nio.file.Paths.get(uploadDir);
 
-            // Hardcoding based on the user's environment for reliability in this session
-            // Dynamic path resolution
-            String projectRoot = System.getProperty("user.dir"); // This lands in 'backend' usually
-            // We need to go up one level to 'food' then to 'frontend/images'
-            // But we must be careful about where the jar/cmd is run from.
-            // Assuming run from 'backend' folder as per README instructions:
-            java.nio.file.Path uploadPath = java.nio.file.Paths.get(projectRoot).getParent().resolve("frontend")
-                    .resolve("images");
-
+            // Create directories if they don't exist (mainly for development)
             if (!java.nio.file.Files.exists(uploadPath)) {
-                java.nio.file.Files.createDirectories(uploadPath);
+                try {
+                    java.nio.file.Files.createDirectories(uploadPath);
+                } catch (Exception e) {
+                    // If we can't create dirs in src/, try temp directory as fallback
+                    uploadDir = System.getProperty("java.io.tmpdir") + java.io.File.separator + "avva-images" + java.io.File.separator;
+                    uploadPath = java.nio.file.Paths.get(uploadDir);
+                    java.nio.file.Files.createDirectories(uploadPath);
+                }
             }
-
-            String uploadDir = uploadPath.toString() + java.io.File.separator;
 
             // Generate unique filename to avoid collisions
             String originalFilename = file.getOriginalFilename();
@@ -86,6 +95,7 @@ public class ProductController {
 
             java.nio.file.Files.write(path, file.getBytes());
 
+            // Return relative path for frontend to access
             return ResponseEntity.ok("images/" + fileName);
         } catch (java.io.IOException e) {
             e.printStackTrace();

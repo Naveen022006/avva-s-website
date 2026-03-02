@@ -3,7 +3,10 @@
    Cart, Products, Orders, and Interactivity
    ============================================= */
 
-const API_BASE = 'http://localhost:8080/api';
+// Determine API Base URL based on environment
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:8080/api'
+    : `${window.location.origin}/api`;
 
 // Prevent browser from restoring scroll position on refresh
 if ('scrollRestoration' in history) {
