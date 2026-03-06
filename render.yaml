@@ -6,11 +6,12 @@ services:
     port: 8080
     plan: free
     memoryMB: 512
+    healthCheckPath: /actuator/health
     envVars:
       - key: SPRING_DATA_MONGODB_URI
-        scope: build,runtime
+        sync: false
       - key: GOOGLE_CLIENT_ID
-        scope: build,runtime
+        sync: false
       - key: SERVER_SERVLET_CONTEXT_PATH
         value: /
     region: oregon
