@@ -227,9 +227,10 @@
     </div>
 
     <script>
+        // Dynamically detect origin — works with any Render service name, not just 'avva-home-foods'
         const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
             ? 'http://localhost:8080/api/auth'
-            : 'https://avva-home-foods.onrender.com/api/auth';
+            : `${window.location.origin}/api/auth`;
 
         // Initialize Google Sign-In
         window.onload = async function () {
