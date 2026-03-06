@@ -343,10 +343,58 @@ async function loadFeaturedProducts() {
     const container = document.getElementById('featuredProducts');
     if (!container) return;
 
+    // Show loading skeleton
+    container.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted);">
+            <div style="font-size: 2rem; margin-bottom: 12px;">⏳</div>
+            <p style="font-size: 1rem;">Loading products...</p>
+        </div>`;
+
     const products = await fetchProducts();
+
+    // Dynamically update and animate the hero Products stat counter
+    const allStats = document.querySelectorAll('.stat-number[data-count]');
+    if (allStats.length >= 2) {
+        const productCountEl = allStats[1];
+        productCountEl.dataset.count = products.length;
+        animateSingleCounter(productCountEl, products.length);
+    }
+
+    if (products.length === 0) {
+        // Show empty state — admin needs to add products
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                <div style="font-size: 3.5rem; margin-bottom: 16px;">🧂</div>
+                <h3 style="font-size: 1.4rem; color: var(--text-primary); margin-bottom: 10px;">Products Coming Soon!</h3>
+                <p style="color: var(--text-muted); max-width: 400px; margin: 0 auto 24px;">
+                    Our handcrafted masalas are being prepared fresh. Check back soon or browse all available products.
+                </p>
+                <a href="products.html" class="btn btn-primary">Browse Products</a>
+            </div>`;
+        return;
+    }
+
     const featured = products.slice(0, 4); // Show first 4 as featured
     container.innerHTML = featured.map(renderProductCard).join('');
 }
+
+// Animate a single counter element to its target value
+function animateSingleCounter(el, target) {
+    const duration = 1500;
+    const step = target / (duration / 16);
+    let current = 0;
+    const timer = setInterval(() => {
+        current += step;
+        if (current >= target) {
+            el.textContent = target;
+            clearInterval(timer);
+        } else {
+            el.textContent = Math.floor(current);
+        }
+    }, 16);
+}
+
+
 
 // ==================== LOAD CATEGORIES FOR FILTERS ====================
 async function loadCategoriesForFilters() {
