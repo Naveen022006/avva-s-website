@@ -67,7 +67,7 @@ public class ProductController {
             // Use Spring's resource loader for environment-agnostic path
             // For Docker/Render: Images are served from src/main/resources/static/images
             // For local dev: Can use frontend/images
-            
+
             String uploadDir = "src/main/resources/static/images/";
             java.nio.file.Path uploadPath = java.nio.file.Paths.get(uploadDir);
 
@@ -77,7 +77,8 @@ public class ProductController {
                     java.nio.file.Files.createDirectories(uploadPath);
                 } catch (Exception e) {
                     // If we can't create dirs in src/, try temp directory as fallback
-                    uploadDir = System.getProperty("java.io.tmpdir") + java.io.File.separator + "avva-images" + java.io.File.separator;
+                    uploadDir = System.getProperty("java.io.tmpdir") + java.io.File.separator + "avva-images"
+                            + java.io.File.separator;
                     uploadPath = java.nio.file.Paths.get(uploadDir);
                     java.nio.file.Files.createDirectories(uploadPath);
                 }
