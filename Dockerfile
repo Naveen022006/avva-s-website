@@ -1,35 +1,43 @@
-# Build Stage
+# =============================================================
+# BUILD STAGE — Maven + JDK 17
+# =============================================================
 FROM maven:3.8.5-openjdk-17 AS build
 WORKDIR /app
 
-# Copy the backend project files
+# --- Dependency cache layer ---
+# Copy pom.xml first and download all dependencies BEFORE copying source.
+# Docker caches this layer and skips the 5-min download on subsequent builds
+# unless pom.xml changes.
 COPY backend/pom.xml .
-COPY backend/src ./src
+RUN mvn dependency:go-offline -B
 
-# Copy the frontend files to the static resources directory of the backend
-# This allows Spring Boot to serve the frontend at the root URL
+# --- Copy source + frontend ---
+COPY backend/src ./src
 COPY frontend ./src/main/resources/static
 
-# Build the application with optimized settings
-RUN mvn clean package -DskipTests -q
+# --- Build JAR (tests skipped, output visible for Render log debugging) ---
+RUN mvn clean package -DskipTests
 
-# Run Stage - eclipse-temurin has curl/wget pre-installed (amazoncorretto does NOT)
+# =============================================================
+# RUN STAGE — eclipse-temurin JRE (has wget pre-installed)
+# =============================================================
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 
-# Set JVM memory limits for Render's 512MB free tier
-ENV JAVA_OPTS="-Xmx384m -Xms128m"
+# Memory limits tuned for Render free-tier 512 MB RAM
+ENV JAVA_OPTS="-Xmx384m -Xms128m -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
 
-# Copy the built JAR from the build stage
+# Copy the built JAR from build stage
 COPY --from=build /app/target/avva-home-foods-1.0.0.jar app.jar
 
-# Expose the application port
+# Render routes external traffic to the PORT it injects — expose that port
 EXPOSE 8080
 
-# Health check for Render — uses wget (available in eclipse-temurin:17-jre-jammy)
-# start-period=90s to account for free-tier cold start + Maven JAR startup time
-HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=5 \
-    CMD wget -qO- http://localhost:8080/actuator/health || exit 1
+# Health check: Render also calls /actuator/health to verify the service is live.
+# Uses PORT env var (default 8080) to probe the correct port.
+# start-period=120s accounts for free-tier slow cold starts (Maven JARs are large).
+HEALTHCHECK --interval=30s --timeout=15s --start-period=120s --retries=5 \
+    CMD wget -qO- http://localhost:${PORT:-8080}/actuator/health || exit 1
 
-# Run the application (sh -c ensures $JAVA_OPTS shell variable expands correctly)
+# Start Spring Boot — sh -c is required so $JAVA_OPTS shell variable expands
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]
