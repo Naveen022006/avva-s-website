@@ -20,16 +20,16 @@ public class AdminSeeder {
     @Bean
     public CommandLineRunner seedAdmin() {
         return args -> {
-            // Check if admin exists
-            if (!userRepository.existsByUsername("admin")) {
+            // Check if admin1 exists
+            if (!userRepository.existsByUsername("admin1")) {
                 User admin = new User();
-                admin.setUsername("admin");
+                admin.setUsername("admin1");
                 admin.setPassword(passwordEncoder.encode("admin123")); // Default password
                 admin.setName("System Admin");
                 admin.setRole("ADMIN");
 
                 userRepository.save(admin);
-                System.out.println(">>> REF-LOG: Default Admin User Created (admin / admin123) <<<");
+                System.out.println(">>> REF-LOG: Default Admin User Created (admin1 / admin123) <<<");
             } else {
                 System.out.println(">>> REF-LOG: Admin User already exists. Skipping seed. <<<");
             }

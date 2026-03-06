@@ -620,17 +620,31 @@ function setupNavbar() {
 
         // If Admin, show dashboard link
         if (user.role === 'ADMIN') {
+            // Try the static adminLink first
             const adminLink = document.getElementById('adminLink');
-            if (adminLink) adminLink.style.display = 'inline-block';
-            userName.textContent += ' (Admin)';
+            if (adminLink) {
+                adminLink.style.display = 'inline-block';
+            } else {
+                // Dynamically inject Dashboard button if adminLink element doesn't exist on this page
+                const dashBtn = document.createElement('a');
+                dashBtn.href = 'admin.html';
+                dashBtn.className = 'btn btn-sm btn-primary';
+                dashBtn.style.cssText = 'margin-left: 10px; padding: 6px 14px; font-size: 0.85rem;';
+                dashBtn.textContent = 'Dashboard';
+                userProfile.appendChild(dashBtn);
+            }
+            userName.textContent = user.name || user.username;
         } else {
             // For regular users, add My Orders link to Nav
             const navLinks = document.getElementById('navLinks');
-            const myOrdersLi = document.createElement('li');
-            myOrdersLi.innerHTML = '<a href="my-orders.html">My Orders</a>';
-            // Insert before the last item (assuming "Contact" or "Admin Login" is last)
-            // Actually, simply appending is fine or insert before the last item
-            navLinks.insertBefore(myOrdersLi, navLinks.lastElementChild);
+            if (navLinks) {
+                // Only add if not already there
+                if (!navLinks.querySelector('a[href="my-orders.html"]')) {
+                    const myOrdersLi = document.createElement('li');
+                    myOrdersLi.innerHTML = '<a href="my-orders.html">My Orders</a>';
+                    navLinks.insertBefore(myOrdersLi, navLinks.lastElementChild);
+                }
+            }
         }
     }
 

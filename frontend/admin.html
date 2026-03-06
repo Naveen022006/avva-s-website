@@ -522,9 +522,6 @@
             checkAdminAuth();
             loadAdminProducts();
             loadAdminOrders();
-            checkAdminAuth();
-            loadAdminProducts();
-            loadAdminOrders();
             loadCategories();
             loadDeliverySettings();
         });
@@ -572,10 +569,11 @@
         function checkAdminAuth() {
             const user = JSON.parse(localStorage.getItem('user'));
             if (!user || user.role !== 'ADMIN') {
-                alert('Access Denied');
-                window.location.href = 'login.html';
+                alert('Access Denied. Please log in as admin.');
+                window.location.href = 'user_login.html';
+                return; // Stop execution here
             }
-            document.getElementById('adminName').textContent = `Welcome, ${user.name}`;
+            document.getElementById('adminName').textContent = `Welcome, ${user.name || user.username}`;
         }
 
         function logout() {
