@@ -13,13 +13,12 @@ COPY frontend ./src/main/resources/static
 # Build the application with optimized settings
 RUN mvn clean package -DskipTests -q
 
-# Run Stage
-FROM amazoncorretto:17-al2-jdk
+# Run Stage - eclipse-temurin has curl/wget pre-installed (amazoncorretto does NOT)
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 
-# Set environment variables for production
+# Set JVM memory limits for Render's 512MB free tier
 ENV JAVA_OPTS="-Xmx384m -Xms128m"
-ENV SPRING_PROFILES_ACTIVE=prod
 
 # Copy the built JAR from the build stage
 COPY --from=build /app/target/avva-home-foods-1.0.0.jar app.jar
@@ -27,9 +26,10 @@ COPY --from=build /app/target/avva-home-foods-1.0.0.jar app.jar
 # Expose the application port
 EXPOSE 8080
 
-# Health check for Render
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:8080/actuator/health || exit 1
+# Health check for Render — uses wget (available in eclipse-temurin:17-jre-jammy)
+# start-period=90s to account for free-tier cold start + Maven JAR startup time
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=5 \
+    CMD wget -qO- http://localhost:8080/actuator/health || exit 1
 
-# Run the application
+# Run the application (sh -c ensures $JAVA_OPTS shell variable expands correctly)
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]
