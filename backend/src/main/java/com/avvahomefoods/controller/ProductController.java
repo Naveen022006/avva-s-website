@@ -131,4 +131,11 @@ public class ProductController {
         productRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    // Delete all products (admin utility)
+    @DeleteMapping("/clear-all")
+    public ResponseEntity<Void> clearAllProducts() {
+        productRepository.deleteAll();
+        return ResponseEntity.noContent().build();
+    }
 }
