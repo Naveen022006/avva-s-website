@@ -592,8 +592,8 @@
         }
 
         // --- PRODUCTS LOGIC ---
-        const API_PROD = 'http://localhost:8080/api/products';
-        const API_CATS = 'http://localhost:8080/api/categories';
+        const API_PROD = `${API_BASE}/products`;
+        const API_CATS = `${API_BASE}/categories`;
 
         async function loadAdminProducts() {
             try {
@@ -769,7 +769,7 @@
         }
 
         // --- ORDERS LOGIC ---
-        const API_ORDERS = 'http://localhost:8080/api/orders';
+        const API_ORDERS = `${API_BASE}/orders`;
 
         // Make orders accessible globally for the view function without re-fetching
         let allOrders = [];
