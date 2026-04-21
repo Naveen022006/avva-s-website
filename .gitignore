@@ -3,3 +3,17 @@
 **/.vscode/
 **/.idea/
 **/.env
+# Java
+*.class
+*.log
+*.jar
+*.war
+
+# Spring Boot
+HELP.md
+
+# Docker
+.dockerenv
+
+# OS
+Thumbs.db
