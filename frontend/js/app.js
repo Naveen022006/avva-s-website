@@ -186,7 +186,7 @@ function getCartItemQuantity(productId, weight) {
     return 0;
 }
 
-function onWeightChange(productId) {
+function renderProductActions(productId) {
     const product = productCache[productId];
 
     // Determine selected weight
@@ -227,6 +227,21 @@ function onWeightChange(productId) {
             </button>
         `;
     }
+}
+
+// Called by weight <select> onchange — updates price display and refreshes the action button
+function onWeightChange(productId) {
+    const product = productCache[productId];
+    if (!product) return;
+    const select = document.getElementById(`weight-${productId}`);
+    if (select && product.weightPrices) {
+        const newPrice = product.weightPrices[select.value];
+        if (newPrice !== undefined) {
+            const priceEl = document.getElementById(`price-${productId}`);
+            if (priceEl) priceEl.textContent = `₹${newPrice}`;
+        }
+    }
+    updateProductCardUI(productId);
 }
 
 function updateProductCardUI(productId) {
@@ -324,6 +339,7 @@ async function loadFeaturedProducts() {
     if (!container) return;
 
     const products = await fetchProducts();
+    if (!products || products.length === 0) return;
     const featured = products.slice(0, 4); // Show first 4 as featured
     container.innerHTML = featured.map(renderProductCard).join('');
 }
