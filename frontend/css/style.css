@@ -1219,19 +1219,20 @@ img {
    FILTERS
    ============================================= */
 .filters-section {
-    padding: 0;
-    margin-bottom: 40px;
+    padding: 16px 0;
+    margin-bottom: 0;
 }
 
 .filters-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
+    gap: 16px;
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
     border-radius: 16px;
-    padding: 12px 16px;
+    padding: 10px 16px;
+    flex-wrap: wrap;
 }
 
 .filter-tabs {
@@ -2125,6 +2126,7 @@ img {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 30px;
     margin-bottom: 60px;
+}
 
 /* =============================================
    NEW FEATURES — Sort, Wishlist, Progress, Back-to-Top
@@ -2135,6 +2137,7 @@ img {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-shrink: 0;
 }
 
 /* Sort dropdown */
@@ -2252,7 +2255,6 @@ img {
     .search-input { width: 160px; }
     .sort-select { font-size: 0.8rem; padding: 8px 10px; }
     .back-to-top { bottom: 16px; right: 16px; width: 40px; height: 40px; font-size: 1.1rem; }
-}
 }
 
 .testimonial-card {
@@ -2640,6 +2642,7 @@ img {
     top: 70px;
     z-index: 100;
     background: var(--bg-primary);
+    padding: 16px 0;
     border-bottom: 1px solid var(--border-subtle);
 }
 
