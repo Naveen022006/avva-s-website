@@ -3,7 +3,7 @@
    Cart, Products, Orders, and Interactivity
    ============================================= */
 
-const API_BASE = '/api';
+const API_BASE = 'http://localhost:8080/api';
 
 // Prevent browser from restoring scroll position on refresh
 if ('scrollRestoration' in history) {

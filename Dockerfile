@@ -21,8 +21,8 @@ WORKDIR /app
 # Copy built jar
 COPY --from=build /app/target/avva-home-foods-1.0.0.jar app.jar
 
-# Render dynamically assigns PORT; expose it (Spring Boot reads ${PORT:8080})
-EXPOSE ${PORT:-8080}
+# Expose Spring Boot port
+EXPOSE 8080
 
 # Start app
 ENTRYPOINT ["java", "-jar", "app.jar"]
