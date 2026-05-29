@@ -17,7 +17,7 @@ function getStarRating(rating) {
 
 async function loadProductDetails(id) {
     try {
-        const response = await fetch(`http://localhost:8080/api/products/${id}`);
+        const response = await fetch(`${API_BASE}/products/${id}`);
         if (!response.ok) throw new Error('Product not found');
         const product = await response.json();
         renderProductDetails(product);
@@ -286,7 +286,7 @@ function addToCartCurrent() {
 
 async function loadProductReviews(productId) {
     try {
-        const response = await fetch(`http://localhost:8080/api/reviews/${productId}`);
+        const response = await fetch(`${API_BASE}/reviews/${productId}`);
         const reviews = await response.json();
         const list = document.getElementById('reviewList');
 
@@ -346,7 +346,7 @@ async function submitReviewModal(e) {
 
     // ... fetch logic ...
     try {
-        const response = await fetch('http://localhost:8080/api/reviews', {
+        const response = await fetch(`${API_BASE}/reviews`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(review)
