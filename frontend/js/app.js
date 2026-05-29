@@ -764,13 +764,12 @@ function setupNavbar() {
         authActions.style.display = 'none';
         userProfile.style.display = 'flex';
         userProfile.style.alignItems = 'center';
-        userName.textContent = user.name || user.username;
+        if (userName) userName.style.display = 'none';
 
         // If Admin, show dashboard link
         if (user.role === 'ADMIN') {
             const adminLink = document.getElementById('adminLink');
             if (adminLink) adminLink.style.display = 'inline-block';
-            userName.textContent += ' (Admin)';
         } else {
             // For regular users, add My Orders link to Nav
             const navLinks = document.getElementById('navLinks');
