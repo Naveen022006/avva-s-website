@@ -8,7 +8,7 @@ services:
     memoryMB: 512
     healthCheckPath: /actuator/health
     envVars:
-      - key: SPRING_DATA_MONGODB_URI
+      - key: MONGODB_URI
         sync: false
       - key: GOOGLE_CLIENT_ID
         sync: false
