@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: avva-home-foods
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    # Render sets PORT automatically; Spring Boot reads it via ${PORT:8080}
+    envVars:
+      - key: GOOGLE_CLIENT_ID
+        sync: false          # Set this in the Render dashboard (secret)
+      - key: SPRING_DATA_MONGODB_URI
+        sync: false          # Set this in the Render dashboard — use a MongoDB Atlas URI
