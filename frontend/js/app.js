@@ -21,10 +21,47 @@ window.addEventListener('load', () => {
 
 // ==================== GLOBAL STATE ====================
 const productCache = {};
+let currentSortOrder = 'default';
 
 // ==================== FALLBACK DATA ====================
 // Used when backend is not running
 const FALLBACK_PRODUCTS = [];
+
+// ==================== WISHLIST ====================
+function getWishlist() {
+    try { return JSON.parse(localStorage.getItem('avvaWishlist') || '[]'); } catch { return []; }
+}
+function saveWishlist(list) { localStorage.setItem('avvaWishlist', JSON.stringify(list)); }
+function isWishlisted(productId) { return getWishlist().includes(productId); }
+function toggleWishlist(productId) {
+    let list = getWishlist();
+    if (list.includes(productId)) {
+        list = list.filter(id => id !== productId);
+        showToast('Removed from wishlist');
+    } else {
+        list.push(productId);
+        showToast('Added to wishlist ❤️');
+    }
+    saveWishlist(list);
+    // Refresh heart icon in DOM if visible
+    const btn = document.getElementById(`wish-${productId}`);
+    if (btn) {
+        btn.classList.toggle('wishlisted', list.includes(productId));
+        btn.setAttribute('aria-label', list.includes(productId) ? 'Remove from wishlist' : 'Add to wishlist');
+    }
+}
+
+// ==================== SORT ====================
+function sortProducts(products, sortBy) {
+    const sorted = [...products];
+    switch (sortBy) {
+        case 'price-asc':  return sorted.sort((a, b) => a.price - b.price);
+        case 'price-desc': return sorted.sort((a, b) => b.price - a.price);
+        case 'name-az':    return sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+        case 'rating':     return sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        default:           return sorted;
+    }
+}
 
 // ==================== CART MANAGEMENT ====================
 function getCart() {
@@ -282,6 +319,7 @@ function renderProductCard(product) {
 
     const rating = product.rating || 0;
     const starsHtml = '★'.repeat(Math.floor(rating)) + (rating % 1 >= 0.5 ? '½' : '');
+    const wishlisted = isWishlisted(product.id);
     return `
         <div class="product-card" data-category="${product.category}">
             <div class="product-image-wrapper">
@@ -292,6 +330,9 @@ function renderProductCard(product) {
                 ${product.inStock
             ? '<span class="product-badge">In Stock</span>'
             : '<span class="product-badge out-of-stock">Out of Stock</span>'}
+                <button class="wishlist-btn ${wishlisted ? 'wishlisted' : ''}" id="wish-${product.id}"
+                    onclick="toggleWishlist('${product.id}')"
+                    aria-label="${wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}">&#10084;</button>
             </div>
             <div class="product-info">
                 <div class="product-category">${product.category}</div>
@@ -413,6 +454,27 @@ async function loadAllProducts() {
         });
     });
 
+    // Setup sort
+    const sortSelect = document.getElementById('sortSelect');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', (e) => {
+            currentSortOrder = e.target.value;
+            // Re-apply current filter with new sort
+            const activeTab = document.querySelector('.filter-tab.active');
+            const category = activeTab ? activeTab.dataset.category : 'all';
+            const searchQuery = document.getElementById('searchInput')?.value?.toLowerCase() || '';
+            let filtered = category === 'all' ? allProducts : allProducts.filter(p => p.category === category);
+            if (searchQuery) {
+                filtered = filtered.filter(p =>
+                    (p.name || '').toLowerCase().includes(searchQuery) ||
+                    (p.description || '').toLowerCase().includes(searchQuery) ||
+                    (p.category || '').toLowerCase().includes(searchQuery)
+                );
+            }
+            renderFilteredProducts(filtered);
+        });
+    }
+
     // Setup search
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
@@ -431,9 +493,14 @@ async function loadAllProducts() {
 function renderFilteredProducts(products) {
     const container = document.getElementById('productsGrid');
     const emptyState = document.getElementById('emptyState');
+    const resultsMeta = document.getElementById('resultsMeta');
+    const resultsCount = document.getElementById('resultsCount');
     if (!container) return;
 
-    if (!products || products.length === 0) {
+    // Apply current sort
+    const sorted = sortProducts(products || [], currentSortOrder);
+
+    if (!sorted || sorted.length === 0) {
         container.style.display = 'none';
         if (emptyState) {
             emptyState.style.display = 'block';
@@ -444,10 +511,18 @@ function renderFilteredProducts(products) {
                     : 'Products coming soon! Check back later.';
             }
         }
+        if (resultsMeta) resultsMeta.style.display = 'none';
     } else {
         container.style.display = 'grid';
         if (emptyState) emptyState.style.display = 'none';
-        container.innerHTML = products.map(renderProductCard).join('');
+        if (resultsMeta && resultsCount) {
+            resultsMeta.style.display = 'block';
+            const total = allProducts ? allProducts.length : sorted.length;
+            resultsCount.textContent = sorted.length === total
+                ? `Showing ${sorted.length} product${sorted.length !== 1 ? 's' : ''}`
+                : `Showing ${sorted.length} of ${total} products`;
+        }
+        container.innerHTML = sorted.map(renderProductCard).join('');
     }
 }
 
@@ -508,6 +583,23 @@ function loadCartPage() {
         document.getElementById('subtotal').textContent = `₹${subtotal} `;
         document.getElementById('deliveryCharge').textContent = delivery === 0 ? `FREE (orders above ₹${freeThreshold})` : `₹${delivery} `;
         document.getElementById('totalAmount').textContent = `₹${total} `;
+
+        // Free delivery progress bar
+        const progressFill = document.getElementById('deliveryProgressFill');
+        const progressText = document.getElementById('deliveryProgressText');
+        if (progressFill && progressText) {
+            if (delivery === 0) {
+                progressText.innerHTML = '🎉 <strong>Free delivery unlocked!</strong>';
+                progressFill.style.width = '100%';
+                progressFill.style.background = 'var(--accent-green-light)';
+            } else {
+                const needed = freeThreshold - subtotal;
+                const pct = Math.min(100, Math.round((subtotal / freeThreshold) * 100));
+                progressText.innerHTML = `Add <strong>₹${needed}</strong> more for <strong>FREE delivery</strong>`;
+                progressFill.style.width = `${pct}%`;
+                progressFill.style.background = '';
+            }
+        }
     }
 }
 
@@ -591,6 +683,21 @@ function showOrderSuccess(orderId) {
         orderIdEl.textContent = `#${orderId}`;
         modal.classList.add('active');
     }
+}
+
+// ==================== BACK TO TOP ====================
+function initBackToTop() {
+    const btn = document.createElement('button');
+    btn.id = 'backToTop';
+    btn.className = 'back-to-top';
+    btn.innerHTML = '↑';
+    btn.setAttribute('aria-label', 'Back to top');
+    btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    document.body.appendChild(btn);
+
+    window.addEventListener('scroll', () => {
+        btn.classList.toggle('visible', window.scrollY > 400);
+    }, { passive: true });
 }
 
 // ==================== TOAST NOTIFICATION ====================
@@ -840,6 +947,7 @@ document.addEventListener('DOMContentLoaded', () => {
     animateCounters();
     setupScrollReveal();
     createParticles();
+    initBackToTop();
 
     // Load featured products on home page
     if (document.getElementById('featuredProducts')) {

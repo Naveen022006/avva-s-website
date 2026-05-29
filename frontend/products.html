@@ -72,9 +72,18 @@
                     <button class="filter-tab" data-category="Pure Spices">Pure Spices</button>
                     <button class="filter-tab" data-category="Special Blends">Special Blends</button>
                 </div>
-                <div class="search-box">
-                    <input type="text" placeholder="Search masalas..." id="searchInput" class="search-input">
-                    <span class="search-icon">🔍</span>
+                <div class="filters-right">
+                    <div class="search-box">
+                        <input type="text" placeholder="Search masalas..." id="searchInput" class="search-input">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                    <select id="sortSelect" class="sort-select" title="Sort products">
+                        <option value="default">Sort: Default</option>
+                        <option value="price-asc">Price: Low → High</option>
+                        <option value="price-desc">Price: High → Low</option>
+                        <option value="name-az">Name: A → Z</option>
+                        <option value="rating">Top Rated</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -83,6 +92,9 @@
     <!-- ==================== PRODUCTS GRID ==================== -->
     <section class="section products-section">
         <div class="container">
+            <div class="results-meta" id="resultsMeta" style="display:none;">
+                <span id="resultsCount"></span>
+            </div>
             <div class="products-grid products-grid-full" id="productsGrid">
                 <!-- Products loaded via JS -->
             </div>
