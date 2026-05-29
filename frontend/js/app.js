@@ -252,11 +252,11 @@ function getCartSubtotal() {
 async function fetchProducts() {
     try {
         const response = await fetch(`${API_BASE}/products`);
-        if (!response.ok) throw new Error('API error');
+        if (!response.ok) throw new Error('API error ' + response.status);
         return await response.json();
     } catch (error) {
-        console.log('Backend not available. Please start the server to view products.');
-        return [];
+        console.error('fetchProducts failed:', error);
+        return null; // null = error, [] = empty DB
     }
 }
 
@@ -265,7 +265,8 @@ function renderProductCard(product) {
     // Cache product for later access
     productCache[product.id] = product;
 
-    const starsHtml = '★'.repeat(Math.floor(product.rating)) + (product.rating % 1 >= 0.5 ? '½' : '');
+    const rating = product.rating || 0;
+    const starsHtml = '★'.repeat(Math.floor(rating)) + (rating % 1 >= 0.5 ? '½' : '');
     return `
         <div class="product-card" data-category="${product.category}">
             <div class="product-image-wrapper">
@@ -285,7 +286,7 @@ function renderProductCard(product) {
                 <p class="product-desc">${product.description}</p>
                 <div class="product-rating">
                     <span class="rating-stars">${starsHtml}</span>
-                    <span>${product.rating} (${product.reviewCount} reviews)</span>
+                    <span>${rating} (${product.reviewCount || 0} reviews)</span>
                 </div>
                 <div class="product-meta">
                     <span class="product-price" id="price-${product.id}">₹${product.price}</span>
@@ -363,10 +364,23 @@ async function loadAllProducts() {
     const emptyState = document.getElementById('emptyState');
     if (!container) return;
 
+    // Show loading state
+    container.style.display = 'block';
+    container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-secondary)">⏳ Loading products...</div>';
+    if (emptyState) emptyState.style.display = 'none';
+
     // Load dynamic categories for filters
     await loadCategoriesForFilters();
 
     allProducts = await fetchProducts();
+
+    // null = API error, [] = empty database
+    if (allProducts === null) {
+        container.style.display = 'block';
+        container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px"><div style="font-size:3rem">⚠️</div><h3 style="color:var(--primary)">Could not load products</h3><p style="color:var(--text-secondary)">The server may be starting up. Please wait a moment and refresh the page.</p><button onclick="location.reload()" class="btn btn-primary" style="margin-top:20px">Retry</button></div>';
+        return;
+    }
+
     renderFilteredProducts(allProducts);
 
     // Setup filter tabs
@@ -389,9 +403,9 @@ async function loadAllProducts() {
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase();
             const filtered = allProducts.filter(p =>
-                p.name.toLowerCase().includes(query) ||
-                p.description.toLowerCase().includes(query) ||
-                p.category.toLowerCase().includes(query)
+                (p.name || '').toLowerCase().includes(query) ||
+                (p.description || '').toLowerCase().includes(query) ||
+                (p.category || '').toLowerCase().includes(query)
             );
             renderFilteredProducts(filtered);
         });
@@ -403,9 +417,17 @@ function renderFilteredProducts(products) {
     const emptyState = document.getElementById('emptyState');
     if (!container) return;
 
-    if (products.length === 0) {
+    if (!products || products.length === 0) {
         container.style.display = 'none';
-        if (emptyState) emptyState.style.display = 'block';
+        if (emptyState) {
+            emptyState.style.display = 'block';
+            const msg = emptyState.querySelector('#emptyStateMsg');
+            if (msg) {
+                msg.textContent = allProducts && allProducts.length > 0
+                    ? 'Try adjusting your search or filter'
+                    : 'Products coming soon! Check back later.';
+            }
+        }
     } else {
         container.style.display = 'grid';
         if (emptyState) emptyState.style.display = 'none';
