@@ -21,6 +21,7 @@ async function loadProductDetails(id) {
         if (!response.ok) throw new Error('Product not found');
         const product = await response.json();
         renderProductDetails(product);
+        loadRelatedProducts(product.category, product.id);
     } catch (error) {
         console.error('Error:', error);
         document.getElementById('productContainer').innerHTML = `<div class="loading-reviews">Error loading product: ${error.message}<br>Check if backend is running.</div>`;
@@ -58,6 +59,13 @@ function renderProductDetails(product) {
     }
 
     const html = `
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <ol class="breadcrumb-list">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li aria-current="page">${product.name}</li>
+            </ol>
+        </nav>
         <div class="product-details-grid">
             <div class="pd-image-wrapper">
                 <img src="${product.imageUrl || 'images/placeholder-spice.jpg'}" alt="${product.name}" class="pd-image">
@@ -82,6 +90,15 @@ function renderProductDetails(product) {
             ? `<button class="btn btn-primary btn-lg" style="width: 100%; margin-bottom: 15px;" onclick="addToCartCurrent()">Add to Cart</button>`
             : `<button class="btn btn-primary btn-lg btn-disabled" style="width: 100%; margin-bottom: 15px;">Out of Stock</button>`
         }
+                </div>
+
+                <!-- Buy Now + Share -->
+                <div class="pd-actions reveal delay-400">
+                    ${product.inStock ? '<button class="btn btn-buy-now btn-lg" onclick="buyNow()">Buy Now 🛒</button>' : ''}
+                    <div class="pd-share-btns">
+                        <button class="share-btn share-whatsapp" onclick="shareOnWhatsApp()" title="Share on WhatsApp"><img src="images/whatsapp-icon.svg" alt="WhatsApp" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;"> Share</button>
+                        <button class="share-btn share-copy" onclick="copyProductLink()" title="Copy link">🔗 Copy Link</button>
+                    </div>
                 </div>
 
                 <!-- Accordion Sections -->
@@ -368,4 +385,50 @@ async function submitReviewModal(e) {
 // Global trigger for sticky button
 function triggerAddToCart() {
     addToCartCurrent();
+}
+
+function shareOnWhatsApp() {
+    const name = document.querySelector('.pd-title').innerText;
+    const price = document.getElementById('detailPrice').innerText;
+    const url = window.location.href;
+    const text = `Check out ${name} \u2014 ${price} on Avva's Home Foods!\n${url}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+function copyProductLink() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+        showToast('Link copied to clipboard!');
+    }).catch(() => {
+        showToast('Copy failed. Please copy the URL manually.');
+    });
+}
+
+function buyNow() {
+    handleStickyAddToCart();
+    window.location.href = 'order.html';
+}
+
+async function loadRelatedProducts(category, currentId) {
+    try {
+        const res = await fetch(`${API_BASE}/products`);
+        if (!res.ok) return;
+        const products = await res.json();
+        const related = products.filter(p => p.category === category && p.id !== currentId).slice(0, 4);
+        if (!related.length) return;
+
+        const section = document.createElement('div');
+        section.className = 'related-products-section';
+        section.innerHTML = `
+            <div class="section-header" style="text-align:center;margin-top:80px;">
+                <span class="section-tag">More Like This</span>
+                <h2 class="section-title">You May Also <span class="highlight">Like</span></h2>
+            </div>
+            <div class="products-grid">
+                ${related.map(p => renderProductCard(p)).join('')}
+            </div>
+        `;
+        document.getElementById('productContainer').appendChild(section);
+    } catch (e) {
+        // silent fail
+    }
 }

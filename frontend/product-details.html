@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Details | Avva's Home Foods</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
     <link
         href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap"
         rel="stylesheet">
@@ -163,10 +164,18 @@
             </a>
             <ul class="nav-links" id="navLinks">
                 <li><a href="index.html">Home</a></li>
-                <li><a href="products.html">Products</a></li>
+                <li><a href="products.html" class="active">Products</a></li>
                 <li><a href="order.html">Order</a></li>
             </ul>
             <div class="nav-actions">
+                <div id="authActions">
+                    <a href="signup.html" class="btn btn-primary btn-sm" id="loginBtn">Sign up</a>
+                </div>
+                <div id="userProfile" style="display: none;">
+                    <span id="userName" style="margin-right: 10px; font-weight: 500;">User</span>
+                    <button id="logoutBtn" class="btn btn-outline btn-sm">Logout</button>
+                    <a href="admin.html" id="adminLink" class="btn btn-sm btn-primary" style="display:none; margin-left: 10px;">Dashboard</a>
+                </div>
                 <a href="order.html" class="cart-btn" id="cartBtn">
                     <span class="cart-icon">🛒</span>
                     <span class="cart-count" id="cartCount">0</span>

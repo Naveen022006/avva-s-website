@@ -321,7 +321,7 @@ function renderProductCard(product) {
     const starsHtml = '★'.repeat(Math.floor(rating)) + (rating % 1 >= 0.5 ? '½' : '');
     const wishlisted = isWishlisted(product.id);
     return `
-        <div class="product-card" data-category="${product.category}">
+        <div class="product-card ${!product.inStock ? 'out-of-stock-card' : ''}" data-category="${product.category}">
             <div class="product-image-wrapper">
                 <a href="product-details.html?id=${product.id}">
                     <img src="${product.imageUrl}" alt="${product.name}" class="product-image"
@@ -698,6 +698,27 @@ function initBackToTop() {
     window.addEventListener('scroll', () => {
         btn.classList.toggle('visible', window.scrollY > 400);
     }, { passive: true });
+}
+
+// ==================== COPY ORDER ID ====================
+function copyOrderId() {
+    const el = document.getElementById('modalOrderId');
+    if (!el) return;
+    const text = el.textContent.replace('#', '');
+    navigator.clipboard.writeText(text).then(() => showToast('Order ID copied!')).catch(() => showToast('Copy failed.'));
+}
+
+// ==================== CONTACT FORM ====================
+function submitContactForm(e) {
+    e.preventDefault();
+    const name = (document.getElementById('contactName').value || '').trim();
+    const phone = (document.getElementById('contactPhone').value || '').trim();
+    const message = (document.getElementById('contactMessage').value || '').trim();
+    if (!name || !phone) { showToast('Please fill in your name and contact.'); return; }
+    const text = `Hi Avva's Home Foods!\n\nName: ${name}\nContact: ${phone}${message ? '\n\nMessage: ' + message : ''}`;
+    window.open(`https://wa.me/919600215761?text=${encodeURIComponent(text)}`, '_blank');
+    document.getElementById('contactForm').reset();
+    showToast('Opening WhatsApp...');
 }
 
 // ==================== TOAST NOTIFICATION ====================
