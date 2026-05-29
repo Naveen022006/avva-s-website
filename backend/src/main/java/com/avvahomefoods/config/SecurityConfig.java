@@ -51,7 +51,9 @@ public class SecurityConfig {
                 "http://localhost:*",
                 "http://127.0.0.1:*",
                 "https://*.onrender.com",
-                "https://avva-home-foods.onrender.com"));
+                "https://avva-home-foods.onrender.com",
+                "https://avvashomefood.naveenhub.dev",
+                "https://*.naveenhub.dev"));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));

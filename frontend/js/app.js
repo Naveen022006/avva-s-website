@@ -188,27 +188,6 @@ function getCartItemQuantity(productId, weight) {
 
 function onWeightChange(productId) {
     const product = productCache[productId];
-    const select = document.getElementById(`weight-${productId}`);
-    const priceEl = document.getElementById(`price-${productId}`);
-
-    if (product && select && priceEl) {
-        const weight = select.value;
-        const newPrice = product.weightPrices[weight];
-        priceEl.textContent = `₹${newPrice}`;
-
-        // Update button state (Add to Cart vs Qty)
-        updateProductCardUI(productId);
-    }
-}
-
-function getCartItemQuantity(productId) {
-    const cart = getCart();
-    const item = cart.find(i => i.productId === productId);
-    return item ? item.quantity : 0;
-}
-
-function renderProductActions(productId) {
-    const product = productCache[productId];
 
     // Determine selected weight
     let selectedWeight = product.weight;

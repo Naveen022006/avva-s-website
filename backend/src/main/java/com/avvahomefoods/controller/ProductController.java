@@ -76,9 +76,8 @@ public class ProductController {
                 try {
                     java.nio.file.Files.createDirectories(uploadPath);
                 } catch (Exception e) {
-                    // If we can't create dirs in src/, try temp directory as fallback
-                    uploadDir = System.getProperty("java.io.tmpdir") + java.io.File.separator + "avva-images"
-                            + java.io.File.separator;
+                    // If we can't create dirs in src/, try static/ directly under CWD
+                    uploadDir = "static/images/";
                     uploadPath = java.nio.file.Paths.get(uploadDir);
                     java.nio.file.Files.createDirectories(uploadPath);
                 }
