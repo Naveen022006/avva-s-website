@@ -606,10 +606,13 @@
         // AUTH CHECK
         function checkAdminAuth() {
             const user = JSON.parse(localStorage.getItem('user'));
-            if (!user || user.role !== 'ADMIN') {
-                alert('Access Denied');
+            // Validate both role AND token — stale sessions from old code used
+            // "dummy-token-for-now" which is no longer accepted by the backend.
+            // Clearing localStorage forces a fresh login that issues the correct token.
+            if (!user || user.role !== 'ADMIN' || user.token !== 'admin-dummy-token-avva') {
+                localStorage.removeItem('user');
                 window.location.href = 'login.html';
-                return; // prevent further execution when user is null / not admin
+                return;
             }
             document.getElementById('adminName').textContent = `Welcome, ${user.name}`;
         }

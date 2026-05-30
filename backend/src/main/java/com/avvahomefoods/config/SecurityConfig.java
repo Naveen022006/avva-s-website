@@ -32,6 +32,8 @@ public class SecurityConfig {
                         .permitAll()
                         // Protect all order write operations (PUT status, DELETE, POST)
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/orders").permitAll()
+                        // Users must be able to fetch their own orders by email (no auth header sent)
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/orders/my-orders").permitAll()
                         .requestMatchers("/api/orders/**").hasRole("ADMIN")
                         .requestMatchers("/api/admin/**", "/api/products/**", "/api/categories/**").hasRole("ADMIN")
                         .anyRequest().permitAll());
