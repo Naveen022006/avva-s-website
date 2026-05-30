@@ -105,6 +105,21 @@
             color: #155724;
         }
 
+        .status-processing {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-shipped {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
         .form-input {
             width: 100%;
             height: 45px;
@@ -594,6 +609,7 @@
             if (!user || user.role !== 'ADMIN') {
                 alert('Access Denied');
                 window.location.href = 'login.html';
+                return; // prevent further execution when user is null / not admin
             }
             document.getElementById('adminName').textContent = `Welcome, ${user.name}`;
         }
@@ -700,11 +716,17 @@
                 weightPrices: weightPrices
             };
 
-            await fetch(API_PROD, {
+            const res = await fetch(API_PROD, {
                 method: 'POST',
                 headers: getAuthHeaders(),
                 body: JSON.stringify(newProd)
             });
+
+            if (!res.ok) {
+                const errText = await res.text().catch(() => 'Unknown error');
+                alert(`Failed to add product (${res.status}): ${errText}`);
+                return;
+            }
 
             document.getElementById('addProductForm').reset();
             document.getElementById('variantPricingContainer').innerHTML = ''; // Clear variants
@@ -768,11 +790,17 @@
                 weightPrices: weightPrices
             };
 
-            await fetch(`${API_PROD}/${id}`, {
+            const res = await fetch(`${API_PROD}/${id}`, {
                 method: 'PUT',
                 headers: getAuthHeaders(),
                 body: JSON.stringify(updatedProd)
             });
+
+            if (!res.ok) {
+                const errText = await res.text().catch(() => 'Unknown error');
+                alert(`Failed to save changes (${res.status}): ${errText}`);
+                return;
+            }
 
             closeEditModal();
             loadAdminProducts();
@@ -858,7 +886,8 @@
                 document.getElementById('addCategoryForm').reset();
                 loadCategories();
             } else {
-                alert('Error adding category');
+                const errText = await res.text().catch(() => 'Unknown error');
+                alert(`Error: ${errText}`);
             }
         });
 
@@ -957,9 +986,7 @@
             try {
                 const res = await fetch(`${API_ORDERS}/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
                 if (res.ok || res.status === 204) {
-                    // Remove from global array and re-render without full fetch
-                    allOrders = allOrders.filter(o => o.id !== id);
-                    loadAdminOrders();
+                    loadAdminOrders(); // re-fetch from backend to keep list in sync
                 } else {
                     alert('Failed to delete order.');
                 }
@@ -986,7 +1013,14 @@
             document.getElementById('viewOrderId').textContent = '#' + order.id;
             document.getElementById('viewOrderDate').textContent = new Date(order.createdAt).toLocaleString();
             document.getElementById('viewOrderStatus').textContent = order.status;
-            document.getElementById('viewOrderStatus').className = `status-badge ${order.status === 'DELIVERED' ? 'status-delivered' : 'status-pending'}`;
+            const statusClassMap = {
+                'DELIVERED':  'status-delivered',
+                'SHIPPED':    'status-shipped',
+                'PROCESSING': 'status-processing',
+                'CANCELLED':  'status-cancelled',
+                'PENDING':    'status-pending'
+            };
+            document.getElementById('viewOrderStatus').className = `status-badge ${statusClassMap[order.status] || 'status-pending'}`;
 
             document.getElementById('viewCustName').textContent = order.customerName;
             document.getElementById('viewCustPhone').textContent = order.phone;

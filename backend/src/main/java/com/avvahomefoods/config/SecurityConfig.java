@@ -24,10 +24,15 @@ public class SecurityConfig {
                 .addFilterBefore(new SimpleAuthFilter(),
                         org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
+                        // Admin-only auth routes must be listed before the broad /api/auth/** permit
+                        .requestMatchers("/api/auth/admin/register").hasRole("ADMIN")
                         .requestMatchers("/api/auth/**", "/error", "/actuator/health").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products/**",
                                 "/api/categories/**", "/api/settings")
                         .permitAll()
+                        // Protect all order write operations (PUT status, DELETE, POST)
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/orders").permitAll()
+                        .requestMatchers("/api/orders/**").hasRole("ADMIN")
                         .requestMatchers("/api/admin/**", "/api/products/**", "/api/categories/**").hasRole("ADMIN")
                         .anyRequest().permitAll());
 
