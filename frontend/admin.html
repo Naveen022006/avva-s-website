@@ -520,24 +520,54 @@
 
         // DELIVERY SETTINGS
         function loadDeliverySettings() {
-            const charge = localStorage.getItem('avvaDeliveryCharge') || '50';
-            const threshold = localStorage.getItem('avvaFreeDeliveryThreshold') || '500';
-            document.getElementById('settingDeliveryCharge').value = charge;
-            document.getElementById('settingFreeThreshold').value = threshold;
+            fetch(`${API_BASE}/settings`)
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('settingDeliveryCharge').value = data.deliveryCharge ?? 50;
+                    document.getElementById('settingFreeThreshold').value = data.freeDeliveryThreshold ?? 500;
+                })
+                .catch(() => {
+                    // fallback to localStorage if API unreachable
+                    document.getElementById('settingDeliveryCharge').value = localStorage.getItem('avvaDeliveryCharge') || '50';
+                    document.getElementById('settingFreeThreshold').value = localStorage.getItem('avvaFreeDeliveryThreshold') || '500';
+                });
         }
 
         function saveDeliverySettings() {
-            const charge = document.getElementById('settingDeliveryCharge').value;
-            const threshold = document.getElementById('settingFreeThreshold').value;
-            if (charge === '' || threshold === '') {
+            const charge = parseFloat(document.getElementById('settingDeliveryCharge').value);
+            const threshold = parseFloat(document.getElementById('settingFreeThreshold').value);
+            if (isNaN(charge) || isNaN(threshold)) {
                 alert('Please fill in both fields.');
                 return;
             }
-            localStorage.setItem('avvaDeliveryCharge', charge);
-            localStorage.setItem('avvaFreeDeliveryThreshold', threshold);
-            const msg = document.getElementById('settingsSavedMsg');
-            msg.style.display = 'block';
-            setTimeout(() => msg.style.display = 'none', 3000);
+
+            const token = localStorage.getItem('adminToken') || 'dummy-token-for-now';
+
+            fetch(`${API_BASE}/settings`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ deliveryCharge: charge, freeDeliveryThreshold: threshold })
+            })
+            .then(r => {
+                if (!r.ok) throw new Error('Save failed: ' + r.status);
+                return r.json();
+            })
+            .then(() => {
+                // Update localStorage as a local cache
+                localStorage.setItem('avvaDeliveryCharge', charge);
+                localStorage.setItem('avvaFreeDeliveryThreshold', threshold);
+                // Bust the in-memory cache in app.js if available
+                if (typeof _deliverySettingsCache !== 'undefined') {
+                    _deliverySettingsCache = null;
+                }
+                const msg = document.getElementById('settingsSavedMsg');
+                msg.style.display = 'block';
+                setTimeout(() => msg.style.display = 'none', 3000);
+            })
+            .catch(err => alert('Failed to save settings: ' + err.message));
         }
 
         // TABS

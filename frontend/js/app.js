@@ -527,7 +527,33 @@ function renderFilteredProducts(products) {
 }
 
 // ==================== LOAD CART PAGE ====================
-function loadCartPage() {
+
+// Cached delivery settings (fetched from backend, falls back to localStorage)
+let _deliverySettingsCache = null;
+
+async function getDeliverySettings() {
+    if (_deliverySettingsCache) return _deliverySettingsCache;
+    try {
+        const res = await fetch(`${API_BASE}/settings`);
+        if (res.ok) {
+            const data = await res.json();
+            _deliverySettingsCache = {
+                deliveryCharge: data.deliveryCharge ?? 50,
+                freeDeliveryThreshold: data.freeDeliveryThreshold ?? 500
+            };
+            // Keep localStorage in sync as a local fallback cache
+            localStorage.setItem('avvaDeliveryCharge', _deliverySettingsCache.deliveryCharge);
+            localStorage.setItem('avvaFreeDeliveryThreshold', _deliverySettingsCache.freeDeliveryThreshold);
+            return _deliverySettingsCache;
+        }
+    } catch (e) { /* fall through to localStorage */ }
+    return {
+        deliveryCharge: parseInt(localStorage.getItem('avvaDeliveryCharge') || '50'),
+        freeDeliveryThreshold: parseInt(localStorage.getItem('avvaFreeDeliveryThreshold') || '500')
+    };
+}
+
+async function loadCartPage() {
     const cartItemsContainer = document.getElementById('cartItems');
     const cartEmpty = document.getElementById('cartEmpty');
     const cartSummary = document.getElementById('cartSummary');
@@ -575,8 +601,7 @@ function loadCartPage() {
 
         // Update summary
         const subtotal = getCartSubtotal();
-        const deliveryFee = parseInt(localStorage.getItem('avvaDeliveryCharge') || '50');
-        const freeThreshold = parseInt(localStorage.getItem('avvaFreeDeliveryThreshold') || '500');
+        const { deliveryCharge: deliveryFee, freeDeliveryThreshold: freeThreshold } = await getDeliverySettings();
         const delivery = subtotal >= freeThreshold ? 0 : deliveryFee;
         const total = subtotal + delivery;
 
@@ -618,8 +643,7 @@ function setupOrderForm() {
         }
 
         const subtotal = getCartSubtotal();
-        const deliveryFee = parseInt(localStorage.getItem('avvaDeliveryCharge') || '50');
-        const freeThreshold = parseInt(localStorage.getItem('avvaFreeDeliveryThreshold') || '500');
+        const { deliveryCharge: deliveryFee, freeDeliveryThreshold: freeThreshold } = await getDeliverySettings();
         const delivery = subtotal >= freeThreshold ? 0 : deliveryFee;
         const totalAmount = subtotal + delivery;
 

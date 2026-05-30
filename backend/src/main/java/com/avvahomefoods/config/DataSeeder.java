@@ -9,12 +9,16 @@ import org.springframework.stereotype.Component;
 
 import com.avvahomefoods.model.Product;
 import com.avvahomefoods.repository.ProductRepository;
+import com.avvahomefoods.repository.StoreSettingsRepository;
 
 @Component
 public class DataSeeder implements CommandLineRunner {
 
         @Autowired
         private ProductRepository productRepository;
+
+        @Autowired
+        private StoreSettingsRepository storeSettingsRepository;
 
         @Override
         public void run(String... args) {
