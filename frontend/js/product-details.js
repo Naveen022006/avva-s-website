@@ -38,13 +38,15 @@ function renderProductDetails(product) {
     // Weight Chips HTML
     let weightHtml = '';
 
-    // Collect all weights
-    let allWeights = [{ w: product.weight, p: product.price }];
+    // Collect all weights, deduplicating by label (weightPrices entries override base weight if same label)
+    const weightMap = new Map();
+    weightMap.set(product.weight, product.price);
     if (product.weightPrices) {
         Object.entries(product.weightPrices).forEach(([w, p]) => {
-            allWeights.push({ w, p });
+            weightMap.set(w, p);
         });
     }
+    let allWeights = Array.from(weightMap.entries()).map(([w, p]) => ({ w, p }));
 
     // Sort/Deduplicate if needed - simple render for now
     if (allWeights.length > 1) {
@@ -236,6 +238,12 @@ function handleStickyAddToCart() {
     const name = document.querySelector('.pd-title').innerText;
     const img = document.querySelector('.pd-image').src;
 
+    // Guard: ensure weight/price are set (may not be if product is still loading)
+    if (!selectedWeightText || selectedPrice <= 0) {
+        showToast('Please select a weight option');
+        return;
+    }
+
     // Add 1 item to cart
     addToCart(id, name, selectedPrice, selectedWeightText, img, 1);
 
@@ -258,7 +266,7 @@ function adjustStickyQty(change) {
 
     if (newQty < 1) {
         // Remove from cart and show Add to Cart button again
-        removeFromCart(id, selectedWeightText);
+        removeFromCart(`${id}-${selectedWeightText}`);
         document.getElementById('stickyAddBtn').style.display = 'block';
         document.getElementById('stickyQtyControl').style.display = 'none';
         return;
@@ -268,7 +276,7 @@ function adjustStickyQty(change) {
     if (change > 0) {
         addToCart(id, name, selectedPrice, selectedWeightText, img, 1);
     } else {
-        removeFromCart(id, selectedWeightText);
+        updateQuantity(`${id}-${selectedWeightText}`, -1);
     }
 
     // Update display

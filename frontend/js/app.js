@@ -795,13 +795,14 @@ function setupNavbar() {
             const adminLink = document.getElementById('adminLink');
             if (adminLink) adminLink.style.display = 'inline-block';
         } else {
-            // For regular users, add My Orders link to Nav
+            // For regular users, add My Orders link to Nav (only if not already added)
             const navLinks = document.getElementById('navLinks');
-            const myOrdersLi = document.createElement('li');
-            myOrdersLi.innerHTML = '<a href="my-orders.html">My Orders</a>';
-            // Insert before the last item (assuming "Contact" or "Admin Login" is last)
-            // Actually, simply appending is fine or insert before the last item
-            navLinks.insertBefore(myOrdersLi, navLinks.lastElementChild);
+            if (navLinks && !document.getElementById('myOrdersNavLink')) {
+                const myOrdersLi = document.createElement('li');
+                myOrdersLi.id = 'myOrdersNavLink';
+                myOrdersLi.innerHTML = '<a href="my-orders.html">My Orders</a>';
+                navLinks.insertBefore(myOrdersLi, navLinks.lastElementChild);
+            }
         }
     }
 

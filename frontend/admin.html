@@ -541,7 +541,8 @@
                 return;
             }
 
-            const token = localStorage.getItem('adminToken') || 'dummy-token-for-now';
+            const _adminUser = JSON.parse(localStorage.getItem('user'));
+            const token = (_adminUser && _adminUser.token) ? _adminUser.token : 'dummy-token-for-now';
 
             fetch(`${API_BASE}/settings`, {
                 method: 'PUT',

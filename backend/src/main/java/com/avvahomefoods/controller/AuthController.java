@@ -1,20 +1,26 @@
 package com.avvahomefoods.controller;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.avvahomefoods.model.User;
 import com.avvahomefoods.repository.UserRepository;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -86,7 +92,9 @@ public class AuthController {
             response.put("username", user.getUsername());
             response.put("name", user.getName());
             response.put("role", user.getRole());
-            response.put("token", "dummy-token-for-now"); // In real app, use JWT
+            // Issue role-specific token so SimpleAuthFilter can grant the correct role
+            String token = "ADMIN".equals(user.getRole()) ? "admin-dummy-token-avva" : "user-dummy-token-avva";
+            response.put("token", token);
             return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.badRequest().body("Error: Invalid username or password!");
@@ -133,7 +141,9 @@ public class AuthController {
                 response.put("username", user.getUsername());
                 response.put("name", user.getName());
                 response.put("role", user.getRole());
-                response.put("token", "dummy-token-for-now");
+                // Issue role-specific token so SimpleAuthFilter can grant the correct role
+                String token = "ADMIN".equals(user.getRole()) ? "admin-dummy-token-avva" : "user-dummy-token-avva";
+                response.put("token", token);
                 return ResponseEntity.ok(response);
             } else {
                 return ResponseEntity.badRequest().body("Invalid ID token");

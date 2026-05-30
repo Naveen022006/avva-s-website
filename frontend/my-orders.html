@@ -169,10 +169,9 @@
                 </div>
                 <!-- User Profile Dropdown (Hidden by default) -->
                 <div id="userProfile" style="display: none; position: relative;">
-                    <div style="cursor: pointer; display: flex; align-items: center; gap: 8px;"
-                        onclick="toggleProfileMenu()">
+                    <div style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
                         <span id="userNameDisplay" style="font-weight: 600;">User</span>
-                        <span>logout</span>
+                        <button id="logoutBtn" class="btn btn-outline btn-sm">Logout</button>
                     </div>
                 </div>
             </div>
@@ -222,6 +221,15 @@
             if (userProfile) {
                 userProfile.style.display = 'block';
                 userNameDisplay.textContent = user.name;
+            }
+
+            // Wire logout button
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    localStorage.removeItem('user');
+                    window.location.href = 'index.html';
+                });
             }
 
             // Load Orders — use email (user.email), fallback to user.username
