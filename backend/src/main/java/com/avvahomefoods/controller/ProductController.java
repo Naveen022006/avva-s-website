@@ -1,6 +1,7 @@
 package com.avvahomefoods.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.avvahomefoods.model.Product;
 import com.avvahomefoods.repository.ProductRepository;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 
 @RestController
 @RequestMapping("/api/products")
@@ -26,6 +29,9 @@ public class ProductController {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private Cloudinary cloudinary;
 
     // Get all products
     @GetMapping
@@ -59,47 +65,25 @@ public class ProductController {
         return productRepository.save(product);
     }
 
-    // Upload Image Endpoint
+    // Upload Image Endpoint — uploads to Cloudinary and returns the permanent CDN URL
     @PostMapping("/upload")
     public ResponseEntity<String> uploadImage(
             @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
         try {
-            // Use Spring's resource loader for environment-agnostic path
-            // For Docker/Render: Images are served from src/main/resources/static/images
-            // For local dev: Can use frontend/images
-
-            String uploadDir = "src/main/resources/static/images/";
-            java.nio.file.Path uploadPath = java.nio.file.Paths.get(uploadDir);
-
-            // Create directories if they don't exist (mainly for development)
-            if (!java.nio.file.Files.exists(uploadPath)) {
-                try {
-                    java.nio.file.Files.createDirectories(uploadPath);
-                } catch (Exception e) {
-                    // If we can't create dirs in src/, try static/ directly under CWD
-                    uploadDir = "static/images/";
-                    uploadPath = java.nio.file.Paths.get(uploadDir);
-                    java.nio.file.Files.createDirectories(uploadPath);
-                }
-            }
-
-            // Generate unique filename to avoid collisions
-            String originalFilename = file.getOriginalFilename();
-            String extension = ".png"; // Default
-            if (originalFilename != null && originalFilename.lastIndexOf(".") > 0) {
-                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            }
-
-            String fileName = java.util.UUID.randomUUID().toString() + extension;
-            java.nio.file.Path path = java.nio.file.Paths.get(uploadDir + fileName);
-
-            java.nio.file.Files.write(path, file.getBytes());
-
-            // Return relative path for frontend to access
-            return ResponseEntity.ok("images/" + fileName);
-        } catch (java.io.IOException e) {
+            Map<?, ?> uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap(
+                            "folder",          "avva-home-foods",
+                            "use_filename",    true,
+                            "unique_filename", true,
+                            "overwrite",       false
+                    )
+            );
+            String secureUrl = (String) uploadResult.get("secure_url");
+            return ResponseEntity.ok(secureUrl);
+        } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Image upload failed");
+            return ResponseEntity.internalServerError().body("Image upload failed: " + e.getMessage());
         }
     }
 
