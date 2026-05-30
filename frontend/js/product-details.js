@@ -70,7 +70,8 @@ function renderProductDetails(product) {
         </nav>
         <div class="product-details-grid">
             <div class="pd-image-wrapper">
-                <img src="${product.imageUrl || 'images/placeholder-spice.jpg'}" alt="${product.name}" class="pd-image">
+                <img src="${(product.imageUrl && product.imageUrl.startsWith('http')) ? product.imageUrl : 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800'}" alt="${product.name}" class="pd-image"
+                     onerror="this.src='https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800'">
             </div>
             <div class="pd-info">
                 <h1 class="pd-title reveal">${product.name}</h1>

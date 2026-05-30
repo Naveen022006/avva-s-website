@@ -320,12 +320,16 @@ function renderProductCard(product) {
     const rating = product.rating || 0;
     const starsHtml = '★'.repeat(Math.floor(rating)) + (rating % 1 >= 0.5 ? '½' : '');
     const wishlisted = isWishlisted(product.id);
+    // Only use Cloudinary/absolute URLs — reject relative fallback paths (e.g. "images/logo.png")
+    // that were saved when Cloudinary wasn't configured yet
+    const FALLBACK_IMG = 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400';
+    const displayImage = (product.imageUrl && product.imageUrl.startsWith('http')) ? product.imageUrl : FALLBACK_IMG;
     return `
         <div class="product-card ${!product.inStock ? 'out-of-stock-card' : ''}" data-category="${product.category}">
             <div class="product-image-wrapper">
                 <a href="product-details.html?id=${product.id}">
-                    <img src="${product.imageUrl}" alt="${product.name}" class="product-image"
-                         onerror="this.src='https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400'">
+                    <img src="${displayImage}" alt="${product.name}" class="product-image"
+                         onerror="this.src='${FALLBACK_IMG}'">
                 </a>
                 ${product.inStock
             ? '<span class="product-badge">In Stock</span>'
