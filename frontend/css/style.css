@@ -2791,3 +2791,295 @@ img {
     .pd-share-btns { flex-direction: column; }
     .breadcrumb { display: none; }
 }
+
+/* =================================================================
+   ENHANCED ANIMATIONS — index page
+   ================================================================= */
+
+/* --- Scroll progress bar --- */
+#scrollProgress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary), #f5d060, var(--primary));
+    background-size: 200% 100%;
+    z-index: 9999;
+    transition: width 0.08s linear;
+    border-radius: 0 2px 2px 0;
+    pointer-events: none;
+}
+
+/* --- Hero accent shimmer text --- */
+@keyframes shimmer-text {
+    0%   { background-position: -200% center; }
+    100% { background-position:  200% center; }
+}
+.hero-title-accent {
+    background: linear-gradient(90deg, var(--primary) 20%, #f5d060 45%, #fffbe6 55%, var(--primary) 80%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer-text 3.5s linear infinite;
+    display: inline-block;
+}
+
+/* --- Hero image glow pulse --- */
+@keyframes hero-glow-pulse {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50%       { opacity: 0.9; transform: scale(1.1); }
+}
+.hero-image-glow {
+    animation: hero-glow-pulse 5s ease-in-out infinite !important;
+}
+
+/* --- Hero image gentle float --- */
+@keyframes hero-img-float {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    50%       { transform: translateY(-12px) scale(1.01); }
+}
+.hero-image {
+    animation: hero-img-float 7s ease-in-out infinite;
+}
+
+/* --- Stat items stagger in --- */
+.stat-item {
+    opacity: 0;
+    transform: translateY(24px) scale(0.9);
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.stat-item.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+.hero-stats .stat-item:nth-child(1) { transition-delay: 0s; }
+.hero-stats .stat-item:nth-child(2) { transition-delay: 0.15s; }
+.hero-stats .stat-item:nth-child(3) { transition-delay: 0.30s; }
+
+/* --- Section tag pop in --- */
+@keyframes tag-pop {
+    0%   { opacity: 0; transform: scale(0.6) translateY(10px); }
+    70%  { transform: scale(1.1) translateY(-2px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.section-tag {
+    opacity: 0;
+    animation: tag-pop 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation-play-state: paused;
+}
+.section-tag.tag-visible {
+    animation-play-state: running;
+}
+
+/* --- Reveal scale class --- */
+.reveal-scale {
+    opacity: 0;
+    transform: scale(0.82);
+    transition: opacity 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: opacity, transform;
+}
+.reveal-scale.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* --- Feature card enhanced hover & icon bounce --- */
+.feature-card {
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+}
+.feature-card:hover {
+    transform: translateY(-14px) scale(1.04) !important;
+    box-shadow: 0 24px 50px rgba(200, 150, 46, 0.28) !important;
+    border-color: var(--primary) !important;
+}
+.feature-icon {
+    display: inline-block;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.feature-card:hover .feature-icon {
+    transform: scale(1.4) rotate(-10deg);
+}
+
+/* --- About image float bob --- */
+@keyframes img-float-bob {
+    0%, 100% { transform: translateY(0px)   rotate(0deg); }
+    33%       { transform: translateY(-10px) rotate(0.6deg); }
+    66%       { transform: translateY(-5px)  rotate(-0.4deg); }
+}
+.about-image {
+    animation: img-float-bob 7s ease-in-out infinite;
+}
+
+/* --- About experience badge bob --- */
+@keyframes badge-bob {
+    0%, 100% { transform: translateY(0) rotate(-6deg); }
+    50%       { transform: translateY(-8px) rotate(-6deg); }
+}
+.about-experience-badge {
+    animation: badge-bob 3.5s ease-in-out infinite;
+}
+
+/* --- About highlights stagger slide in --- */
+.about-highlight-item {
+    opacity: 0;
+    transform: translateX(-24px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.about-highlight-item.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+.about-highlight-item:nth-child(1) { transition-delay: 0.05s; }
+.about-highlight-item:nth-child(2) { transition-delay: 0.18s; }
+.about-highlight-item:nth-child(3) { transition-delay: 0.31s; }
+.about-highlight-item:nth-child(4) { transition-delay: 0.44s; }
+
+/* --- Step card hover & step icon bounce --- */
+.step-card {
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+}
+.step-card:hover {
+    transform: translateY(-12px) scale(1.03) !important;
+    box-shadow: 0 20px 45px rgba(200, 150, 46, 0.22) !important;
+}
+.step-icon {
+    display: inline-block;
+    transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.step-card:hover .step-icon {
+    transform: scale(1.45) rotate(12deg);
+}
+
+/* --- Animated step connector line draw --- */
+@keyframes line-draw {
+    from { clip-path: inset(0 100% 0 0); }
+    to   { clip-path: inset(0 0%   0 0); }
+}
+.connector-line {
+    display: block;
+    animation: none;
+}
+.connector-line.line-animate {
+    animation: line-draw 1s ease forwards;
+}
+
+/* --- CTA card animated glow circles --- */
+@keyframes cta-glow-pulse {
+    0%, 100% { opacity: 0.15; transform: scale(1); }
+    50%       { opacity: 0.4;  transform: scale(1.12); }
+}
+.cta-circle   { animation: cta-glow-pulse 4s ease-in-out infinite; }
+.cta-circle-2 { animation: cta-glow-pulse 4s ease-in-out 2s infinite; }
+
+/* --- Navbar underline slide on links --- */
+.nav-links a {
+    position: relative;
+}
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: var(--primary);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+.nav-links a:hover::after,
+.nav-links a.active::after {
+    width: 60%;
+}
+
+/* --- Button click ripple --- */
+.btn { position: relative; overflow: hidden; }
+.btn-ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transform: scale(0);
+    animation: ripple-out 0.6s linear;
+    pointer-events: none;
+}
+@keyframes ripple-out {
+    to { transform: scale(5); opacity: 0; }
+}
+
+/* --- Contact form field focus lift --- */
+.contact-form-card input,
+.contact-form-card textarea {
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.25s ease;
+}
+.contact-form-card input:focus,
+.contact-form-card textarea:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(200, 150, 46, 0.18);
+}
+
+/* --- Footer link hover slide --- */
+.footer-links-col a {
+    position: relative;
+    transition: color 0.3s ease, padding-left 0.3s ease;
+}
+.footer-links-col a:hover {
+    padding-left: 8px;
+    color: var(--primary);
+}
+
+/* --- Floating spice particle layer --- */
+.section-spice-particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+.features-strip,
+.how-section,
+.about-section {
+    position: relative;
+}
+.features-strip .container,
+.how-section .container,
+.about-section .container {
+    position: relative;
+    z-index: 1;
+}
+@keyframes spice-drift {
+    0%   { transform: translateY(0)    rotate(0deg);   opacity: 0.55; }
+    33%  { transform: translateY(-22px) rotate(120deg); opacity: 0.38; }
+    66%  { transform: translateY(-12px) rotate(240deg); opacity: 0.65; }
+    100% { transform: translateY(0)    rotate(360deg); opacity: 0.55; }
+}
+.spice-particle {
+    position: absolute;
+    font-size: 1.3rem;
+    pointer-events: none;
+    user-select: none;
+    animation: spice-drift var(--dur, 7s) ease-in-out var(--delay, 0s) infinite;
+}
+
+/* --- Section entrance with reveal-left / reveal-right for about --- */
+.about-image-wrapper {
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: opacity 0.9s cubic-bezier(0.5, 0, 0, 1), transform 0.9s cubic-bezier(0.5, 0, 0, 1);
+    will-change: opacity, transform;
+}
+.about-image-wrapper.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+.about-content {
+    opacity: 0;
+    transform: translateX(50px);
+    transition: opacity 0.9s cubic-bezier(0.5, 0, 0, 1) 0.15s, transform 0.9s cubic-bezier(0.5, 0, 0, 1) 0.15s;
+    will-change: opacity, transform;
+}
+.about-content.visible {
+    opacity: 1;
+    transform: translateX(0);
+}

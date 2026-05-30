@@ -876,6 +876,66 @@ function setupScrollReveal() {
     });
 
     revealElements.forEach(el => observer.observe(el));
+
+    // --- Section tags ---
+    const sectionTags = document.querySelectorAll('.section-tag');
+    const tagObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('tag-visible');
+                tagObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.3 });
+    sectionTags.forEach(t => tagObserver.observe(t));
+
+    // --- Hero stat items ---
+    const statItems = document.querySelectorAll('.stat-item');
+    const statObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                statObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.3 });
+    statItems.forEach(s => statObserver.observe(s));
+
+    // --- About image wrapper & about content ---
+    const aboutParts = document.querySelectorAll('.about-image-wrapper, .about-content');
+    const aboutObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                aboutObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15 });
+    aboutParts.forEach(a => aboutObserver.observe(a));
+
+    // --- About highlight items ---
+    const highlights = document.querySelectorAll('.about-highlight-item');
+    const highlightObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                highlightObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.2 });
+    highlights.forEach(h => highlightObserver.observe(h));
+
+    // --- Step connector line draw ---
+    const connectorLines = document.querySelectorAll('.connector-line');
+    const lineObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('line-animate');
+                lineObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+    connectorLines.forEach(l => lineObserver.observe(l));
 }
 
 // ==================== HERO PARTICLES ====================
@@ -898,6 +958,66 @@ function createParticles() {
         `;
         container.appendChild(particle);
     }
+}
+
+// ==================== SCROLL PROGRESS BAR ====================
+function setupScrollProgress() {
+    const bar = document.getElementById('scrollProgress');
+    if (!bar) return;
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
+    }, { passive: true });
+}
+
+// ==================== SECTION SPICE PARTICLES ====================
+function createSectionSpiceParticles() {
+    const spices = ['🌶️', '🫚', '🌿', '✨', '🍂', '🌾', '⭐'];
+    const containers = [
+        document.getElementById('featureParticles'),
+        document.getElementById('howParticles')
+    ];
+    containers.forEach(container => {
+        if (!container) return;
+        const count = 8;
+        for (let i = 0; i < count; i++) {
+            const p = document.createElement('span');
+            p.className = 'spice-particle';
+            p.textContent = spices[Math.floor(Math.random() * spices.length)];
+            const dur = (Math.random() * 6 + 5).toFixed(1) + 's';
+            const delay = (Math.random() * 4).toFixed(1) + 's';
+            p.style.cssText = `
+                left: ${Math.random() * 95}%;
+                top: ${Math.random() * 90}%;
+                --dur: ${dur};
+                --delay: ${delay};
+                font-size: ${(Math.random() * 0.8 + 0.9).toFixed(1)}rem;
+                opacity: ${(Math.random() * 0.25 + 0.2).toFixed(2)};
+            `;
+            container.appendChild(p);
+        }
+    });
+}
+
+// ==================== BUTTON RIPPLE ====================
+function setupButtonRipple() {
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const ripple = document.createElement('span');
+            ripple.className = 'btn-ripple';
+            ripple.style.cssText = `
+                width: ${size}px;
+                height: ${size}px;
+                left: ${e.clientX - rect.left - size / 2}px;
+                top: ${e.clientY - rect.top - size / 2}px;
+            `;
+            this.appendChild(ripple);
+            ripple.addEventListener('animationend', () => ripple.remove());
+        });
+    });
 }
 
 // ==================== REVIEWS MANAGEMENT ====================
@@ -997,6 +1117,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setupScrollReveal();
     createParticles();
     initBackToTop();
+    setupScrollProgress();
+    createSectionSpiceParticles();
+    setupButtonRipple();
 
     // Load featured products on home page
     if (document.getElementById('featuredProducts')) {
