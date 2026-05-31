@@ -11,40 +11,44 @@
         rel="stylesheet">
     <link rel="stylesheet" href="css/style.css?v=4">
     <style>
-        /* Product Details Specific Styles */
+        /* ── Product Details Layout ── */
         .product-details-container {
-            padding: 120px 0 60px;
+            padding: 100px 0 60px;
         }
 
         .product-details-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            margin-bottom: 80px;
+            gap: 64px;
+            margin: 36px 0 72px;
             align-items: center;
-            /* Vertically center image and details */
         }
 
+        /* Image column */
         .pd-image-wrapper {
-            background: transparent;
-            /* Removed ash background */
-            padding: 0;
-            /* Removed padding to maximize space */
+            position: relative;
+            background: radial-gradient(ellipse at 55% 45%, rgba(200,150,46,0.1) 0%, transparent 68%);
+            border: 1px solid rgba(200,150,46,0.14);
+            border-radius: 28px;
+            padding: 28px;
             text-align: center;
-            border: none;
-            /* Removed border */
         }
 
         .pd-image {
             width: 100%;
-            max-width: 600px;
-            /* Increased from 400px */
+            max-width: 520px;
             border-radius: 20px;
-            box-shadow: var(--shadow-lg);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(200,150,46,0.08);
             margin: 0 auto;
             display: block;
+            transition: transform 0.4s ease;
         }
 
+        .pd-image:hover {
+            animation: pd-img-float 3.5s ease-in-out infinite;
+        }
+
+        /* Info column */
         .pd-info {
             display: flex;
             flex-direction: column;
@@ -53,24 +57,25 @@
 
         .pd-title {
             font-family: var(--font-display);
-            font-size: 3rem;
-            margin-bottom: 16px;
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 14px;
             color: var(--primary);
+            line-height: 1.2;
         }
 
         .pd-rating {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 24px;
-            font-size: 1.1rem;
+            margin-bottom: 22px;
+            font-size: 1.05rem;
         }
 
         .pd-price {
             font-size: 2rem;
             font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             font-family: var(--font-body);
         }
 
@@ -78,22 +83,23 @@
             font-size: 1.05rem;
             line-height: 1.8;
             color: var(--text-secondary);
-            margin-bottom: 30px;
+            margin-bottom: 28px;
         }
 
         .pd-actions {
             display: flex;
-            gap: 20px;
-            align-items: center;
-            margin-top: 20px;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0;
         }
 
         /* Reviews Section */
         .reviews-section {
             background: var(--bg-card);
-            padding: 60px;
-            border-radius: 30px;
+            padding: 56px;
+            border-radius: 28px;
             border: 1px solid var(--border-subtle);
+            margin-bottom: 60px;
         }
 
         .reviews-header {
@@ -102,13 +108,15 @@
             align-items: center;
             margin-bottom: 40px;
             border-bottom: 1px solid var(--border-subtle);
-            padding-bottom: 20px;
+            padding-bottom: 22px;
+            flex-wrap: wrap;
+            gap: 16px;
         }
 
         .review-list {
             display: flex;
             flex-direction: column;
-            gap: 30px;
+            gap: 24px;
         }
 
         .review-item {
@@ -121,7 +129,10 @@
         .review-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 12px;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 6px;
         }
 
         .reviewer-name {
@@ -134,20 +145,101 @@
             color: var(--text-muted);
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
+        /* ── Entrance animations ── */
+
+        /* Image wrapper slides in from left */
+        .pd-image-wrapper {
+            animation: pd-slide-left 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+        }
+
+        /* Info panel slides in from right (no opacity — lets children reveal work) */
+        .pd-info {
+            animation: pd-slide-right 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
+        }
+
+        @keyframes pd-slide-left {
+            from { opacity: 0; transform: translateX(-56px) scale(0.96); }
+            to   { opacity: 1; transform: translateX(0) scale(1); }
+        }
+
+        @keyframes pd-slide-right {
+            from { transform: translateX(52px); opacity: 0.4; }
+            to   { transform: translateX(0);    opacity: 1; }
+        }
+
+        @keyframes pd-img-float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50%       { transform: translateY(-14px) scale(1.015); }
+        }
+
+        /* Weight chips pop in with stagger */
+        .weight-chip {
+            opacity: 0;
+            transform: translateY(8px) scale(0.88);
+            animation: chip-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        .weight-chip:nth-child(1) { animation-delay: 0.55s; }
+        .weight-chip:nth-child(2) { animation-delay: 0.65s; }
+        .weight-chip:nth-child(3) { animation-delay: 0.75s; }
+        .weight-chip:nth-child(4) { animation-delay: 0.85s; }
+        .weight-chip:nth-child(5) { animation-delay: 0.95s; }
+
+        @keyframes chip-pop {
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Reviews section fades up */
+        .reviews-section {
+            animation: fadeInUp 0.65s ease 0.4s both;
+        }
+
+        /* Review items stagger in */
+        .review-item.rev-anim {
+            opacity: 0;
+            transform: translateY(22px);
+            transition:
+                opacity  0.45s ease calc(var(--ri, 0) * 0.09s),
+                transform 0.45s ease calc(var(--ri, 0) * 0.09s);
+        }
+        .review-item.rev-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Sticky cart bar slides up */
+        .sticky-cart-bar {
+            animation: stickySlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both;
+        }
+        @keyframes stickySlideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+
+        /* Accordion header hover */
+        .accordion-header:hover { color: var(--primary); }
+
+        /* Modal card scales in */
+        .modal-overlay[style*="flex"] .modal-card {
+            animation: modalPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.82) translateY(24px); }
+            to   { opacity: 1; transform: scale(1)    translateY(0); }
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 900px) {
             .product-details-grid {
                 grid-template-columns: 1fr;
-                gap: 40px;
+                gap: 36px;
             }
-
-            .pd-title {
-                font-size: 2rem;
-            }
-
-            .reviews-section {
-                padding: 30px;
-            }
+            .pd-image-wrapper { padding: 18px; }
+        }
+        @media (max-width: 768px) {
+            .product-details-container { padding-top: 80px; padding-bottom: 80px; }
+            .pd-title { font-size: 2rem; }
+            .reviews-section { padding: 28px; }
+            .pd-info { padding: 0 4px; }
         }
     </style>
 </head>

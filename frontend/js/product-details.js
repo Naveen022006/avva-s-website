@@ -62,12 +62,15 @@ function renderProductDetails(product) {
 
     const html = `
         <nav class="breadcrumb" aria-label="Breadcrumb">
-            <ol class="breadcrumb-list">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="products.html">Products</a></li>
-                <li aria-current="page">${product.name}</li>
-            </ol>
+            <div class="container">
+                <ol class="breadcrumb-list">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="products.html">Products</a></li>
+                    <li aria-current="page">${product.name}</li>
+                </ol>
+            </div>
         </nav>
+        <div class="container">
         <div class="product-details-grid">
             <div class="pd-image-wrapper">
                 <img src="${(product.imageUrl && product.imageUrl.startsWith('http')) ? product.imageUrl : 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800'}" alt="${product.name}" class="pd-image"
@@ -157,6 +160,7 @@ function renderProductDetails(product) {
             <div class="review-list" id="reviewList">
                 <div class="loading-reviews">Loading reviews...</div>
             </div>
+        </div>
         </div>
     `;
 
@@ -321,8 +325,8 @@ async function loadProductReviews(productId) {
             return;
         }
 
-        list.innerHTML = reviews.map(r => `
-            <div class="review-item">
+        list.innerHTML = reviews.map((r, i) => `
+            <div class="review-item rev-anim" style="--ri:${i}">
                 <div class="review-header">
                     <span class="reviewer-name">${r.customerName}</span>
                     <span class="review-date">${new Date(r.createdAt).toLocaleDateString()}</span>
@@ -331,6 +335,13 @@ async function loadProductReviews(productId) {
                 <p>${r.comment}</p>
             </div>
         `).join('');
+
+        // Stagger reviews into view
+        requestAnimationFrame(() => {
+            document.querySelectorAll('.review-item.rev-anim').forEach((el, i) => {
+                setTimeout(() => el.classList.add('rev-visible'), i * 90);
+            });
+        });
 
     } catch (error) {
         console.error('Error loading reviews:', error);
@@ -432,11 +443,22 @@ async function loadRelatedProducts(category, currentId) {
                 <span class="section-tag">More Like This</span>
                 <h2 class="section-title">You May Also <span class="highlight">Like</span></h2>
             </div>
-            <div class="products-grid">
-                ${related.map(p => renderProductCard(p)).join('')}
+            <div class="products-grid related-grid">
+                ${related.map((p, i) => `<div class="prod-anim-wrapper" style="--pi:${i}">${renderProductCard(p)}</div>`).join('')}
             </div>
         `;
         document.getElementById('productContainer').appendChild(section);
+
+        // Observe related cards for stagger entrance
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('prod-visible');
+                    obs.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.08, rootMargin: '0px 0px -20px 0px' });
+        section.querySelectorAll('.prod-anim-wrapper').forEach(w => obs.observe(w));
     } catch (e) {
         // silent fail
     }
