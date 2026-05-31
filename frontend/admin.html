@@ -605,6 +605,7 @@
             } else if (tabName === 'orders') {
                 document.querySelector('.admin-tabs').children[1].classList.add('active');
                 document.getElementById('ordersPanel').classList.add('active');
+                loadAdminOrders();
             } else {
                 document.querySelector('.admin-tabs').children[2].classList.add('active');
                 document.getElementById('categoriesPanel').classList.add('active');
@@ -976,12 +977,18 @@
 
         async function loadAdminOrders() {
             try {
-                const res = await fetch(API_ORDERS);
-                allOrders = await res.json();
+                const res = await fetch(API_ORDERS, { headers: getAuthHeaders() });
                 const tbody = document.getElementById('ordersTableBody');
+
+                if (!res.ok) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#dc3545;padding:24px;font-size:0.95rem">⚠️ Failed to load orders (HTTP ${res.status}). Make sure you are logged in as admin and the backend is running.</td></tr>`;
+                    return;
+                }
+
+                allOrders = await res.json();
                 tbody.innerHTML = '';
 
-                if (Array.isArray(allOrders)) {
+                if (Array.isArray(allOrders) && allOrders.length > 0) {
                     allOrders.forEach(o => {
                         const items = o.items.map(i => `${i.productName} (x${i.quantity})`).join(', ');
                         const date = new Date(o.createdAt).toLocaleDateString();
@@ -1015,9 +1022,13 @@
                         `;
                         tbody.appendChild(tr);
                     });
+                } else if (Array.isArray(allOrders)) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:40px">No orders yet.</td></tr>';
                 }
             } catch (e) {
-                console.error("Err loading orders", e);
+                console.error('Err loading orders', e);
+                const tbody = document.getElementById('ordersTableBody');
+                if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#dc3545;padding:24px">Error loading orders. Check console for details.</td></tr>';
             }
         }
 
