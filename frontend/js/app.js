@@ -724,6 +724,8 @@ function setupOrderForm() {
                 quantity: item.quantity,
                 price: item.price
             })),
+            subtotal: subtotal,
+            deliveryCharge: delivery,
             totalAmount: totalAmount
         };
 

@@ -116,14 +116,25 @@
             color: var(--text-primary);
         }
 
-        .order-total {
-            display: flex;
-            justify-content: flex-end;
-            padding-top: 15px;
+        .order-total-breakdown {
             border-top: 1px solid var(--border-light);
-            font-size: 1.2rem;
+            padding-top: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .order-subtotal, .order-delivery {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .order-total {
+            font-size: 1.15rem;
             font-weight: 700;
             color: var(--primary);
+            margin-top: 4px;
         }
 
         .empty-state {
@@ -331,8 +342,12 @@
                             ${itemsHtml}
                         </div>
                         
-                        <div class="order-total">
-                            Total: ₹${order.totalAmount}
+                        <div class="order-total-breakdown">
+                            ${order.subtotal > 0 ? `
+                            <div class="order-subtotal">Subtotal: ₹${order.subtotal}</div>
+                            <div class="order-delivery">Delivery: ${order.deliveryCharge > 0 ? '₹' + order.deliveryCharge : '<span style="color:#4caf50">FREE</span>'}</div>
+                            ` : ''}
+                            <div class="order-total">Total: ₹${order.totalAmount}</div>
                         </div>
                     </div>
                 `;

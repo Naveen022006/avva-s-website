@@ -1,9 +1,10 @@
 package com.avvahomefoods.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "orders")
 public class Order {
@@ -17,6 +18,8 @@ public class Order {
     private String city;
     private String pincode;
     private List<OrderItem> items;
+    private double subtotal;
+    private double deliveryCharge;
     private double totalAmount;
     private String status;
     private String paymentMethod;
@@ -90,6 +93,22 @@ public class Order {
 
     public void setItems(List<OrderItem> items) {
         this.items = items;
+    }
+
+    public double getSubtotal() {
+        return subtotal;
+    }
+
+    public void setSubtotal(double subtotal) {
+        this.subtotal = subtotal;
+    }
+
+    public double getDeliveryCharge() {
+        return deliveryCharge;
+    }
+
+    public void setDeliveryCharge(double deliveryCharge) {
+        this.deliveryCharge = deliveryCharge;
     }
 
     public double getTotalAmount() {
