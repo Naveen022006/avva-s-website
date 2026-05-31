@@ -78,14 +78,50 @@
         .data-table th,
         .data-table td {
             text-align: left;
-            padding: 12px;
+            padding: 12px 14px;
             border-bottom: 1px solid var(--border-subtle);
             color: var(--text-primary);
+            vertical-align: middle;
         }
 
         .data-table th {
             color: var(--text-secondary);
             font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* Column widths for orders table */
+        #ordersTableBody tr td:nth-child(1) { width: 90px;  white-space: nowrap; }  /* Order ID */
+        #ordersTableBody tr td:nth-child(2) { width: 90px;  white-space: nowrap; }  /* Date */
+        #ordersTableBody tr td:nth-child(3) { width: 140px; }                        /* Customer */
+        #ordersTableBody tr td:nth-child(4) { }                                      /* Items — flex */
+        #ordersTableBody tr td:nth-child(5) { width: 80px;  white-space: nowrap; }  /* Total */
+        #ordersTableBody tr td:nth-child(6) { width: 160px; }                        /* Status */
+        #ordersTableBody tr td:nth-child(7) { width: 130px; white-space: nowrap; }  /* Action */
+
+        /* Action cell: keep buttons on one line, centered vertically */
+        .order-action-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+
+        .btn-delete-order {
+            background: transparent;
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            border-radius: 6px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            line-height: 1.4;
+            transition: background 0.2s, color 0.2s;
+        }
+        .btn-delete-order:hover {
+            background: #dc3545;
+            color: #fff;
         }
 
         .status-badge {
@@ -1023,7 +1059,7 @@
                         tr.innerHTML = `
                             <td>#${shortId}</td>
                             <td>${date}</td>
-                            <td>${o.customerName}<br><small>${o.phone}</small></td>
+                            <td>${o.customerName}<br><small style="color:var(--text-muted)">${o.phone}</small></td>
                             <td><small>${items}</small></td>
                             <td>₹${o.totalAmount}</td>
                             <td>
@@ -1032,11 +1068,11 @@
                                     ${statusOptions}
                                 </select>
                             </td>
-                            <td style="display: flex; gap: 6px; align-items: center;">
-                                <button class="btn btn-outline btn-sm" onclick="viewOrderDetails('${o.id}')">View</button>
-                                <button class="btn btn-sm" onclick="deleteOrder('${o.id}')" 
-                                    style="background: transparent; border: 1px solid #dc3545; color: #dc3545; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-size: 0.8rem;" 
-                                    title="Delete Order">🗑️ Delete</button>
+                            <td>
+                                <div class="order-action-cell">
+                                    <button class="btn btn-outline btn-sm" onclick="viewOrderDetails('${o.id}')">View</button>
+                                    <button class="btn-delete-order" onclick="deleteOrder('${o.id}')" title="Delete Order">🗑️ Delete</button>
+                                </div>
                             </td>
                         `;
                         tbody.appendChild(tr);
