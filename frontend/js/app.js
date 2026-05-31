@@ -386,7 +386,23 @@ async function loadFeaturedProducts() {
     const products = await fetchProducts();
     if (!products || products.length === 0) return;
     const featured = products.slice(0, 4); // Show first 4 as featured
-    container.innerHTML = featured.map(renderProductCard).join('');
+
+    // Inject cards with individual stagger-in wrappers
+    container.innerHTML = featured.map((p, i) =>
+        `<div class="featured-card-wrapper" style="--card-index:${i}">${renderProductCard(p)}</div>`
+    ).join('');
+
+    // Observe each wrapper and trigger its entrance when scrolled into view
+    const wrappers = container.querySelectorAll('.featured-card-wrapper');
+    const cardObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('card-visible');
+                cardObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    wrappers.forEach(w => cardObserver.observe(w));
 }
 
 // ==================== LOAD CATEGORIES FOR FILTERS ====================

@@ -2796,6 +2796,28 @@ img {
    ENHANCED ANIMATIONS — index page
    ================================================================= */
 
+/* --- Featured product cards — stagger scroll entrance --- */
+.featured-card-wrapper {
+    opacity: 0;
+    transform: translateY(48px) scale(0.93);
+    transition:
+        opacity  0.65s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--card-index, 0) * 0.12s),
+        transform 0.65s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--card-index, 0) * 0.12s);
+    will-change: opacity, transform;
+}
+.featured-card-wrapper.card-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+/* card-visible also fires the shimmer sweep on the card image */
+.featured-card-wrapper.card-visible .product-image {
+    animation: img-sweep-in 0.8s ease calc(var(--card-index, 0) * 0.12s + 0.3s) both;
+}
+@keyframes img-sweep-in {
+    from { filter: brightness(0.4) saturate(0); }
+    to   { filter: brightness(1)   saturate(1); }
+}
+
 /* --- Scroll progress bar --- */
 #scrollProgress {
     position: fixed;
