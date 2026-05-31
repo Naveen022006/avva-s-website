@@ -441,9 +441,19 @@ async function loadAllProducts() {
     const emptyState = document.getElementById('emptyState');
     if (!container) return;
 
-    // Show loading state
-    container.style.display = 'block';
-    container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-secondary)">⏳ Loading products...</div>';
+    // Show skeleton loading state
+    container.style.display = 'grid';
+    container.innerHTML = Array.from({length: 6}, () => `
+        <div class="skeleton-card">
+            <div class="skeleton-img skeleton-pulse"></div>
+            <div class="skeleton-body">
+                <div class="skeleton-line skeleton-pulse" style="width:45%;height:12px;margin-bottom:10px"></div>
+                <div class="skeleton-line skeleton-pulse" style="width:75%;height:18px;margin-bottom:8px"></div>
+                <div class="skeleton-line skeleton-pulse" style="width:60%;height:13px;margin-bottom:16px"></div>
+                <div class="skeleton-line skeleton-pulse" style="width:35%;height:22px"></div>
+            </div>
+        </div>
+    `).join('');
     if (emptyState) emptyState.style.display = 'none';
 
     // Load dynamic categories for filters
@@ -466,6 +476,8 @@ async function loadAllProducts() {
         tab.addEventListener('click', () => {
             filterTabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
+            tab.classList.add('tab-flash');
+            setTimeout(() => tab.classList.remove('tab-flash'), 400);
             const category = tab.dataset.category;
             const filtered = category === 'all'
                 ? allProducts
@@ -542,8 +554,39 @@ function renderFilteredProducts(products) {
                 ? `Showing ${sorted.length} product${sorted.length !== 1 ? 's' : ''}`
                 : `Showing ${sorted.length} of ${total} products`;
         }
-        container.innerHTML = sorted.map(renderProductCard).join('');
+
+        // Fade out existing cards, then swap and stagger in new ones
+        const existingCards = container.querySelectorAll('.prod-anim-wrapper');
+        if (existingCards.length > 0) {
+            existingCards.forEach((c, i) => {
+                c.style.transition = `opacity 0.18s ease ${i * 0.03}s, transform 0.18s ease ${i * 0.03}s`;
+                c.style.opacity = '0';
+                c.style.transform = 'translateY(-10px) scale(0.96)';
+            });
+            setTimeout(() => injectAnimatedCards(container, sorted), 220);
+        } else {
+            injectAnimatedCards(container, sorted);
+        }
     }
+}
+
+function injectAnimatedCards(container, sorted) {
+    container.innerHTML = sorted.map((p, i) =>
+        `<div class="prod-anim-wrapper" style="--pi:${i}">${renderProductCard(p)}</div>`
+    ).join('');
+
+    // Observe each wrapper — entrance fires when it scrolls into view
+    const wrappers = container.querySelectorAll('.prod-anim-wrapper');
+    const obs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('prod-visible');
+                obs.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+
+    wrappers.forEach(w => obs.observe(w));
 }
 
 // ==================== LOAD CART PAGE ====================

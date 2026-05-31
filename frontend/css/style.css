@@ -2793,6 +2793,88 @@ img {
 }
 
 /* =================================================================
+   PRODUCTS PAGE ANIMATIONS
+   ================================================================= */
+
+/* --- Skeleton loader cards --- */
+.skeleton-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--card-radius, 16px);
+    overflow: hidden;
+}
+.skeleton-img {
+    width: 100%;
+    height: 200px;
+    background: var(--bg-elevated);
+}
+.skeleton-body {
+    padding: 16px;
+}
+.skeleton-line {
+    background: var(--bg-elevated);
+    border-radius: 6px;
+    display: block;
+}
+@keyframes skeleton-shimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position:  400px 0; }
+}
+.skeleton-pulse {
+    background: linear-gradient(90deg,
+        var(--bg-elevated) 25%,
+        rgba(200,150,46,0.07) 50%,
+        var(--bg-elevated) 75%);
+    background-size: 800px 100%;
+    animation: skeleton-shimmer 1.6s linear infinite;
+}
+
+/* --- Products page card entrance --- */
+.prod-anim-wrapper {
+    opacity: 0;
+    transform: translateY(44px) scale(0.94);
+    transition:
+        opacity  0.55s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--pi, 0) * 0.07s),
+        transform 0.55s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--pi, 0) * 0.07s);
+    will-change: opacity, transform;
+}
+.prod-anim-wrapper.prod-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+/* Image colour-sweep on entrance */
+.prod-anim-wrapper.prod-visible .product-image {
+    animation: img-sweep-in 0.7s ease calc(var(--pi, 0) * 0.07s + 0.25s) both;
+}
+
+/* --- Filter tab active flash --- */
+@keyframes tab-flash-anim {
+    0%   { box-shadow: 0 0 0 0 rgba(200,150,46,0.6); }
+    60%  { box-shadow: 0 0 0 8px rgba(200,150,46,0); }
+    100% { box-shadow: 0 0 0 0 rgba(200,150,46,0); }
+}
+.filter-tab.tab-flash {
+    animation: tab-flash-anim 0.4s ease;
+}
+
+/* --- Page header entrance (products page) --- */
+.page-header {
+    overflow: hidden;
+}
+.page-header .section-tag  { animation: fadeInUp 0.6s ease 0.1s both; }
+.page-header .page-title   { animation: fadeInUp 0.7s ease 0.2s both; }
+.page-header .page-subtitle{ animation: fadeInUp 0.7s ease 0.32s both; }
+
+/* --- Filter bar slide down --- */
+.filters-section {
+    animation: filterSlideDown 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+}
+@keyframes filterSlideDown {
+    from { opacity: 0; transform: translateY(-18px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =================================================================
    ENHANCED ANIMATIONS — index page
    ================================================================= */
 
