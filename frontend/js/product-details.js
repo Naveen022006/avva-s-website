@@ -425,7 +425,13 @@ function copyProductLink() {
 
 function buyNow() {
     handleStickyAddToCart();
-    window.location.href = 'order.html';
+    // Redirect to login if not logged in, else go straight to cart
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+        window.location.href = 'order.html';
+    } else {
+        window.location.href = 'login.html?redirect=order.html';
+    }
 }
 
 async function loadRelatedProducts(category, currentId) {

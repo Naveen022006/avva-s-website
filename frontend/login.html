@@ -179,6 +179,9 @@
             ? 'http://localhost:8080/api/auth'
             : `${window.location.origin}/api/auth`;
 
+        // Read optional redirect destination from ?redirect= query param
+        const _redirectAfterLogin = new URLSearchParams(window.location.search).get('redirect') || 'index.html';
+
         // Initialize Google Sign-In
         window.onload = async function () {
             try {
@@ -222,7 +225,7 @@
                 if (res.ok) {
                     const data = await res.json();
                     localStorage.setItem('user', JSON.stringify(data));
-                    window.location.href = 'index.html';
+                    window.location.href = _redirectAfterLogin;
                 } else {
                     const errorText = await res.text();
                     errorDiv.textContent = errorText || 'Google Sign-In failed';
@@ -264,7 +267,7 @@
 
                     localStorage.setItem('user', JSON.stringify(data));
                     // alert('Admin Login Successful!');
-                    window.location.href = 'index.html';
+                    window.location.href = _redirectAfterLogin;
                 } else {
                     errorDiv.textContent = 'Invalid username or password';
                     errorDiv.style.display = 'block';

@@ -889,6 +889,19 @@ function setupNavbar() {
     }
 }
 
+// ==================== AUTH-GATED CART NAVIGATION ====================
+// Call this instead of navigating directly to order.html.
+// Redirects to login with a ?redirect= param so the user lands on
+// the cart after a successful login.
+function goToCart() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+        window.location.href = 'order.html';
+    } else {
+        window.location.href = 'login.html?redirect=order.html';
+    }
+}
+
 // ==================== COUNTER ANIMATION ====================
 function animateCounters() {
     const counters = document.querySelectorAll('.stat-number[data-count]');
