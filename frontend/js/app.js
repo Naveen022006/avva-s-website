@@ -69,6 +69,11 @@ function getCart() {
     if (!cartJson) return [];
     try {
         let cart = JSON.parse(cartJson);
+        if (!Array.isArray(cart)) {
+            console.warn('Cart data was not an array, resetting it');
+            saveCart([]);
+            return [];
+        }
         // Filter out invalid items (fixes undefined/NaN issues)
         const validCart = cart.filter(item => item.productId && item.productName && item.productName !== 'undefined' && !isNaN(item.price));
         if (validCart.length !== cart.length) {
@@ -86,6 +91,23 @@ function getCart() {
 function saveCart(cart) {
     localStorage.setItem('avvaCart', JSON.stringify(cart));
     updateCartCount();
+}
+
+function getProductIdFromVariantId(variantId) {
+    if (!variantId) return null;
+    const cart = getCart();
+    const exactItem = cart.find(item => item.variantId === variantId);
+    if (exactItem && exactItem.productId) {
+        return exactItem.productId;
+    }
+
+    const matchingItem = cart.find(item => item.variantId === variantId || item.productId === variantId);
+    if (matchingItem && matchingItem.productId) {
+        return matchingItem.productId;
+    }
+
+    const fallback = variantId.includes('-') ? variantId.slice(0, variantId.lastIndexOf('-')) : variantId;
+    return fallback || null;
 }
 
 function addToCart(id, name, price, weight, imageUrl, quantity = 1) {
@@ -175,7 +197,7 @@ function removeFromCart(variantId) {
     saveCart(cart);
     loadCartPage();
     // We need to find the productId from variantId to update the card UI
-    const productId = variantId.split('-')[0];
+    const productId = getProductIdFromVariantId(variantId);
     if (productId) updateProductCardUI(productId);
 }
 
@@ -192,7 +214,7 @@ function updateQuantity(variantId, delta) {
     saveCart(cart);
     loadCartPage();
     // Update card UI if visible
-    const productId = variantId ? variantId.split('-')[0] : null;
+    const productId = getProductIdFromVariantId(variantId);
     if (productId) updateProductCardUI(productId);
 }
 
@@ -696,12 +718,41 @@ function setupOrderForm() {
     const form = document.getElementById('orderForm');
     if (!form) return;
 
+    const phonePattern = /^\d{10}$/;
+    const pincodePattern = /^\d{6}$/;
+
+    function validateOrderForm() {
+        const name = document.getElementById('customerName').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const address = document.getElementById('address').value.trim();
+        const city = document.getElementById('city').value.trim();
+        const pincode = document.getElementById('pincode').value.trim();
+
+        if (!name || !email || !phone || !address || !city || !pincode) {
+            return 'Please fill in all delivery details.';
+        }
+        if (!phonePattern.test(phone)) {
+            return 'Enter a valid 10-digit phone number.';
+        }
+        if (!pincodePattern.test(pincode)) {
+            return 'Enter a valid 6-digit pincode.';
+        }
+        return null;
+    }
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const cart = getCart();
         if (cart.length === 0) {
             showToast('Your cart is empty!');
+            return;
+        }
+
+        const validationError = validateOrderForm();
+        if (validationError) {
+            showToast(validationError);
             return;
         }
 
